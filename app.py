@@ -15,7 +15,7 @@ from model.inception3d import *
 from data_processing.wlasl_videos import *
 
 st.header("Welcome to Gesto AI")
-st.write("Upload any video of a sign and get a predicted word as text!")
+st.write("Upload any video of a sign and get a predicted word as text! The demo video for this app is 05727.mp4 from the WLASL dataset.")
 
 uploaded_video = st.file_uploader("Upload a video...")
 
