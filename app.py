@@ -14,29 +14,31 @@ st.write("Upload any video of a sign and get a predicted word as text! The demo 
 
 uploaded_video = st.file_uploader("Upload a video...")
 
-def load_model(device=0):
+ # We'll use the weights from the general pre-trained inception model, then the weights for the fine tuned one on ASL
+ # Download these from https://github.com/dxli94/WLASL#training-and-testing
+ID3_PRETRAINED_WEIGHTS_PATH = "GestoAI/models/WLASL/weights/rgb_imagenet.pt"
+WLASL_PRETRAINED_WEIGHTS_PATH = "GestoAI/models/WLASL/archived/asl100/FINAL_nslt_100_iters=896_top1=65.89_top5=84.11_top10=89.92.pt"
+NUM_CLASSES = 100
+
+def load_inception_model(device=0):
     """
     Args:
         device: int
     Returns:
         pretrained_i3d_model: InceptionI3d
     """
-    # We'll use the weights from the general pre-trained inception model, then the weights for the fine tuned one on ASL
-    id3_pretrained_weights_path = "/Users/dafirebanks/Projects/GestoAI/models/WLASL/weights/rgb_imagenet.pt"
-    wlasl_pretrained_weights_path = "/Users/dafirebanks/Projects/GestoAI/models/WLASL/archived/asl100/FINAL_nslt_100_iters=896_top1=65.89_top5=84.11_top10=89.92.pt"
-    num_classes = 100
     
     # Initialize model
     pretrained_i3d_model = InceptionI3d(400, in_channels=3)
 
     # Load the general inception model weights
-    pretrained_i3d_model.load_state_dict(torch.load(id3_pretrained_weights_path))
+    pretrained_i3d_model.load_state_dict(torch.load(ID3_PRETRAINED_WEIGHTS_PATH))
 
     # Adapt the final layer for the number of classes we expect
-    pretrained_i3d_model.replace_logits(num_classes)
+    pretrained_i3d_model.replace_logits(NUM_CLASSES)
 
     # Load the weights for the fine-tuned model on ASL
-    pretrained_i3d_model.load_state_dict(torch.load(wlasl_pretrained_weights_path, map_location=torch.device('cpu')))
+    pretrained_i3d_model.load_state_dict(torch.load(WLASL_PRETRAINED_WEIGHTS_PATH, map_location=torch.device('cpu')))
 
     # Move to GPU
     # i3d.cuda(device=device)
@@ -105,7 +107,7 @@ def predict_on_video(model, batched_frames):
     return out_labels[-1]
 
 if uploaded_video is not None:
-    pretrained_model = load_model()
+    pretrained_model = load_inception_model()
 
     # We'll need this path for opening the video with OpenCV
     video_filepath = uploaded_video.name
