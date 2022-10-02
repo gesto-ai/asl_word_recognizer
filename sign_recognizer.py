@@ -40,7 +40,6 @@ class ASLWordRecognizer:
 
         print("loading mapping")
         self.mapping = load_mapping(mapping_path)
-        print(self.mapping)
 
     @torch.no_grad()
     def predict(self, video_filepath: Union[str, Path]) -> str:
