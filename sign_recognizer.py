@@ -20,9 +20,6 @@ STAGED_MODEL_DIRNAME = Path(__file__).resolve().parent / "artifacts" / "sign-rec
 MODEL_FILE = "model.pt"
 
 LABEL_MAPPING_PATH = "./data_processing/wlasl_class_list.txt"
-# ID3_PRETRAINED_WEIGHTS_PATH = "./models/WLASL/weights/rgb_imagenet.pt"
-# WLASL_PRETRAINED_WEIGHTS_PATH = "./models/WLASL/archived/asl100/FINAL_nslt_100_iters=896_top1=65.89_top5=84.11_top10=89.92.pt"
-# NUM_CLASSES = 100
 
 
 class ASLWordRecognizer:
