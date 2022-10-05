@@ -36,7 +36,8 @@ class ASLWordRecognizer:
             mapping_path = LABEL_MAPPING_PATH
 
         print("loading model")
-        self.model = load_inception_model()
+        # self.model = load_inception_model()
+        self.model = torch.jit.load(model_path)
 
         print("loading mapping")
         self.mapping = load_mapping(mapping_path)
@@ -53,7 +54,7 @@ class ASLWordRecognizer:
         pred_str = convert_y_label_to_string(y=y_pred[-1], mapping=self.mapping)
 
         return pred_str
-    
+
     @torch.no_grad()
     def predict_on_video(self, batched_frames):
         """
@@ -84,20 +85,23 @@ class ASLWordRecognizer:
         # Return all predictions
         return out_labels
 
+
 def load_mapping(mapping_path):
     mapping = {}
     with open(mapping_path, "r") as f:
         labels: list = f.readlines()
-    
+
     for label in labels:
         idx, ann = label.split("\t")
         mapping[int(idx)] = ann.replace("\n", "")
-    
+
     return mapping
+
 
 def convert_y_label_to_string(y: np.int64, mapping: Sequence[str]) -> str:
     # return "".join([mapping[int(i)] for i in y])
     return mapping[y]
+
 
 def process_video(video_filepath, start_frame, end_frame):
     """
@@ -128,7 +132,6 @@ def process_video(video_filepath, start_frame, end_frame):
     return batched_frames
 
 
-
 def load_inception_model(device=0):
     """
     Args:
@@ -136,24 +139,29 @@ def load_inception_model(device=0):
     Returns:
         pretrained_i3d_model: InceptionI3d
     """
-    
-    # Initialize model
-    pretrained_i3d_model = InceptionI3d(400, in_channels=3)
 
-    # Load the general inception model weights
-    pretrained_i3d_model.load_state_dict(torch.load(ID3_PRETRAINED_WEIGHTS_PATH))
+    # Initialize model
+    pretrained_i3d_model = torch.jit.script(InceptionI3d(100, in_channels=3))
+
+    # # Load the general inception model weights
+    # pretrained_i3d_model.load_state_dict(
+    #     torch.load(ID3_PRETRAINED_WEIGHTS_PATH), strict=False
+    # )
 
     # Adapt the final layer for the number of classes we expect
-    pretrained_i3d_model.replace_logits(NUM_CLASSES)
+    # pretrained_i3d_model.replace_logits(NUM_CLASSES)
 
     # Load the weights for the fine-tuned model on ASL
-    pretrained_i3d_model.load_state_dict(torch.load(WLASL_PRETRAINED_WEIGHTS_PATH, map_location=torch.device('cpu')))
+    pretrained_i3d_model.load_state_dict(
+        torch.load(WLASL_PRETRAINED_WEIGHTS_PATH, map_location=torch.device("cpu")),
+        strict=False,
+    )
 
     # Move to GPU
     # i3d.cuda(device=device)
 
     # Add data parallelism layer (but this is not actually that useful here since we're only using 1 example)
-    pretrained_i3d_model = nn.DataParallel(pretrained_i3d_model)
+    # pretrained_i3d_model = nn.DataParallel(pretrained_i3d_model)
 
     # Put model in inference mode
     pretrained_i3d_model.eval()
@@ -165,13 +173,16 @@ def load_inception_model(device=0):
 def main():
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument(
+        "model_path", type=str, help="location of pytorch torchscript model"
+    )
+    parser.add_argument(
         "filename",
         type=str,
         help="Name for a video file. This can be a local path, a URL, a URI from AWS/GCP/Azure storage, an HDFS path, or any other resource locator supported by the smart_open library.",
     )
     args = parser.parse_args()
 
-    sign_recognizer = ASLWordRecognizer()
+    sign_recognizer = ASLWordRecognizer(args.model_path)
     pred_str = sign_recognizer.predict(args.filename)
     print(pred_str)
 
