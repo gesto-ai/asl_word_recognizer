@@ -16,28 +16,28 @@ from torchvision import transforms
 from data_processing.wlasl_videos import *
 from model.inception3d import *
 
-# STAGED_MODEL_DIRNAME = Path(__file__).resolve().parent / "artifacts" / "paragraph-text-recognizer"
-# MODEL_FILE = "model.pt"
+STAGED_MODEL_DIRNAME = Path(__file__).resolve().parent / "artifacts" / "sign-recognizer"
+MODEL_FILE = "model.pt"
 
 LABEL_MAPPING_PATH = "./data_processing/wlasl_class_list.txt"
-ID3_PRETRAINED_WEIGHTS_PATH = "./models/WLASL/weights/rgb_imagenet.pt"
-WLASL_PRETRAINED_WEIGHTS_PATH = "./models/WLASL/archived/asl100/FINAL_nslt_100_iters=896_top1=65.89_top5=84.11_top10=89.92.pt"
-NUM_CLASSES = 100
+# ID3_PRETRAINED_WEIGHTS_PATH = "./models/WLASL/weights/rgb_imagenet.pt"
+# WLASL_PRETRAINED_WEIGHTS_PATH = "./models/WLASL/archived/asl100/FINAL_nslt_100_iters=896_top1=65.89_top5=84.11_top10=89.92.pt"
+# NUM_CLASSES = 100
 
 
 class ASLWordRecognizer:
     """Recognizes a word from sign in a video."""
 
     def __init__(self, model_path=None, mapping_path=None):
-        # if model_path is None:
-        #     model_path = STAGED_MODEL_DIRNAME / MODEL_FILE
-        # self.model = torch.jit.load(model_path)
-        if mapping_path is None:
-            mapping_path = LABEL_MAPPING_PATH
+        if model_path is None:
+            model_path = STAGED_MODEL_DIRNAME / MODEL_FILE
+            print(model_path)
 
         print("loading model")
-        # self.model = load_inception_model()
         self.model = torch.jit.load(model_path)
+
+        if mapping_path is None:
+            mapping_path = LABEL_MAPPING_PATH
 
         print("loading mapping")
         self.mapping = load_mapping(mapping_path)
@@ -132,49 +132,13 @@ def process_video(video_filepath, start_frame, end_frame):
     return batched_frames
 
 
-def load_inception_model(device=0):
-    """
-    Args:
-        device: int
-    Returns:
-        pretrained_i3d_model: InceptionI3d
-    """
-
-    # Initialize model
-    pretrained_i3d_model = torch.jit.script(InceptionI3d(100, in_channels=3))
-
-    # # Load the general inception model weights
-    # pretrained_i3d_model.load_state_dict(
-    #     torch.load(ID3_PRETRAINED_WEIGHTS_PATH), strict=False
-    # )
-
-    # Adapt the final layer for the number of classes we expect
-    # pretrained_i3d_model.replace_logits(NUM_CLASSES)
-
-    # Load the weights for the fine-tuned model on ASL
-    pretrained_i3d_model.load_state_dict(
-        torch.load(WLASL_PRETRAINED_WEIGHTS_PATH, map_location=torch.device("cpu")),
-        strict=False,
-    )
-
-    # Move to GPU
-    # i3d.cuda(device=device)
-
-    # Add data parallelism layer (but this is not actually that useful here since we're only using 1 example)
-    # pretrained_i3d_model = nn.DataParallel(pretrained_i3d_model)
-
-    # Put model in inference mode
-    pretrained_i3d_model.eval()
-
-    # pretrained_model = PL_resnet50.load_from_checkpoint(checkpoint_path=weight_loc).eval()#.cuda(device=0)
-    return pretrained_i3d_model
-
-
 def main():
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    parser.add_argument(
-        "model_path", type=str, help="location of pytorch torchscript model"
-    )
+    # parser.add_argument(
+    #     "model_path",
+    #     type=str,
+    #     help="location of pytorch torchscript model",
+    # )
     parser.add_argument(
         "filename",
         type=str,
@@ -182,7 +146,7 @@ def main():
     )
     args = parser.parse_args()
 
-    sign_recognizer = ASLWordRecognizer(args.model_path)
+    sign_recognizer = ASLWordRecognizer()
     pred_str = sign_recognizer.predict(args.filename)
     print(pred_str)
 
