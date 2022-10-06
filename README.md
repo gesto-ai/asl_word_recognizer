@@ -39,6 +39,8 @@ streamlit run app.py
 
 ## Steps to deploy model code
 
+Source: [https://docs.aws.amazon.com/lambda/latest/dg/images-create.html](https://docs.aws.amazon.com/lambda/latest/dg/images-create.html)
+
 ### 1. Make sure you have configured your AWS credentials in your terminal and run the login process
 ```
 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin [YOUR_USER_ID].dkr.ecr.us-east-1.amazonaws.com    
