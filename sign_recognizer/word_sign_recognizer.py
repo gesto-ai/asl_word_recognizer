@@ -12,8 +12,8 @@ from typing import Sequence, Union
 import torch
 from torchvision import transforms
 
-from data_processing.wlasl_videos import *
-from model.inception3d import *
+from sign_recognizer.data_processing.wlasl_videos import *
+from sign_recognizer.model.inception3d import *
 
 # This defines the parent folder of this file, and adds "/artifacts" to the path string
 # An example would be BASE_DIRNAME = `/Users/dafirebanks/GestoAI/model_serve/sign_recognizer/`
@@ -70,6 +70,8 @@ class ASLWordRecognizer:
         Returns:
             top_prediction: int
         """
+
+        print("step 1")
         # Inference time! Get the logits for the single video example
         per_frame_logits = self.model(batched_frames)
 
@@ -77,11 +79,13 @@ class ASLWordRecognizer:
         # st.write(f"Logits shape: {per_frame_logits.shape}")
 
         # Predictions from the logits
+        print("step 2")
         predictions = torch.max(per_frame_logits, dim=2)[0]
         # st.write(f"Predictions shape after getting the max per the third dimension: {predictions.shape}")
 
         # Sort predictions in a descending order of relevance - the top prediction is at the end
         # This is an array of indices!
+        print("step 3")
         out_labels = np.argsort(predictions.cpu().detach().numpy()[0])
         # st.write(f"Output predictions: {out_labels}")
 
@@ -89,7 +93,9 @@ class ASLWordRecognizer:
         # return out_labels[-1]
 
         # Return all predictions
-        return out_labels
+        print("step 4")
+        pred_str = convert_y_label_to_string(y=out_labels[-1], mapping=self.mapping)
+        return pred_str
 
 def load_mapping(mapping_path):
     mapping = {}
