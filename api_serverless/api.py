@@ -1,3 +1,4 @@
+from sign_recognizer.word_sign_recognizer import ASLWordRecognizer
 import sys
 
 def handler(event, context):
