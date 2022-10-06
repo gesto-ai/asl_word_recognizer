@@ -36,3 +36,42 @@ After you have gotten the model weights from Step 1 of running the sign recogniz
 ```
 streamlit run app.py
 ```
+
+## Steps to deploy model code
+
+### 1. Make sure you have configured your AWS credentials in your terminal and run the login process
+```
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin [YOUR_USER_ID].dkr.ecr.us-east-1.amazonaws.com    
+```
+
+### 2. Building the Docker image
+- If you’re on an M1 Mac, from `model_server/`, run
+```
+docker build -t sign_recognizer . --file api_serverless/Dockerfile --platform=linux/amd64
+```
+- Else, from `model_server/`, run
+```
+docker build -t sign_recognizer . --file api_serverless/Dockerfile
+```
+
+### 2.1 Test your image before pushing it to Amazon's Elastic Container Registry (ECR)
+- On one terminal, run `docker run -p 9000:8080 sign_recognizer:latest`
+ (add the `--platform=linux/amd64` if you're on an M1 Mac)
+- On another terminal, run `curl -i -XPOST \
+  "http://localhost:9000/2015-03-31/functions/function/invocations" \
+  -d '{"video_url": "https://drive.google.com/uc?export=download&id=1lWdgnNbkosDJ_7p7_qwyBuKqCYs1yvEI"}'`. Make sure it runs!
+
+### 3. Tag your image!
+```
+docker tag sign_recognizer:latest [YOUR_USER_ID].dkr.ecr.us-east-1.amazonaws.com/sign_recognizer:latest
+```
+
+### 4. Push your image
+```
+docker push [YOUR_USER_ID].dkr.ecr.us-east-1.amazonaws.com/sign_recognizer:latest
+```
+
+### 5. Create a Lambda function
+
+- AWS Docs https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-images.html
+- More instructions: [https://github.com/full-stack-deep-learning/fsdl-text-recognizer-2022/blob/main/notebooks/lab99_serverless_aws.ipynb](https://github.com/full-stack-deep-learning/fsdl-text-recognizer-2022/blob/main/notebooks/lab99_serverless_aws.ipynb)
