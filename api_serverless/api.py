@@ -1,21 +1,22 @@
 import json
-from sign_recognizer.word_sign_recognizer import ASLWordRecognizer
-from sign_recognizer.word_sign_recognizer import process_video
+from sign_recognizer.word_sign_recognizer import ASLWordRecognizer, process_video, convert_y_label_to_string
 
 model = ASLWordRecognizer()
 
 def handler(event, _context):
-    print("INFO loading video")
+    print("INFO loading video from URL")
     video = _load_video(event)
-
     if video is None:
-        return {"statusCode": 400, "message": "neither video_url nor image found in event"}
+        return {"statusCode": 400, "message": "`video_url` not found in event"}
     print("INFO video loaded")
+    
     print("INFO starting inference")
     pred = model.predict_on_video(video)
+    pred_str = convert_y_label_to_string(y=pred[-1], mapping=model.mapping)
     print("INFO inference complete")
-    print("INFO pred {}".format(pred))
-    return {"pred": str(pred)}
+    print("INFO pred {}".format(pred_str))
+
+    return {"pred": str(pred_str)}
 
 def _load_video(event):
     event = _from_string(event)
@@ -24,14 +25,7 @@ def _load_video(event):
     if video_url is not None:
         print("INFO url {}".format(video_url))
         return process_video(video_url, 1, 74)
-        # return util.read_image_pil(video_url, grayscale=True)
-    else:
-        video = event.get("video")
-        if video is not None:
-            print("INFO reading video from event")
-            return "LMAO" #util.read_b64_image(image, grayscale=True)
-        else:
-            return None
+    return None
 
 
 def _from_string(event):
@@ -43,4 +37,4 @@ def _from_string(event):
 
 
 # curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{"msg": "hello"}'
-# curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{"video_url": "https://drive.google.com/uc?export=download&id=1lWdgnNbkosDJ_7p7_qwyBuKqCYs1yvEI"}'
+# curl -XPOST "https://sevowty6mttqlw77sypxj7h5ze0pncnn.lambda-url.us-east-1.on.aws/" -H "Content-Type: application/json" -d '{"video_url": "https://drive.google.com/uc?export=download&id=1lWdgnNbkosDJ_7p7_qwyBuKqCYs1yvEI"}'
