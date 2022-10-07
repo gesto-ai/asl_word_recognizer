@@ -13,7 +13,6 @@ ECR_URI = $(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_REGION).amazonaws.com
 IMAGE_URI = $(ECR_URI)/$(LAMBDA_AND_CONTAINER_NAME)
 AWS_DOCKERFILE_NAME = api_serverless/Dockerfile
 
-
 build_image:
 	docker build -t $(LAMBDA_AND_CONTAINER_NAME) . --file $(AWS_DOCKERFILE_NAME)
 
@@ -53,7 +52,7 @@ create_lambda_role:
 	--role-name $(LAMBDA_ROLE_NAME) \
 	--policy-arn arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess
 
-# Create lambda function AND increase timeout AND max out memory
+# Create lambda function, increase timeout, max out memory, and create public function URL
 create_lambda_function:
 	echo "wait 10 seconds for role..."	
 	$(shell sleep 10)
@@ -70,6 +69,21 @@ create_lambda_function:
 	--timeout 60 \
 	--memory-size 10240
 
+	aws lambda create-function-url-config \
+	--function-name $(LAMBDA_AND_CONTAINER_NAME) \
+	--auth-type NONE \
+	--cors '{"AllowOrigins": ["*"], "AllowCredentials": false}'
+
+	aws lambda add-permission \
+	--function-name $(LAMBDA_AND_CONTAINER_NAME) \
+	--action lambda:invokeFunctionUrl \
+	--statement-id "open-access" \
+	--principal "*" \
+	--function-url-auth-type NONE
+
+get_lambda_url:
+	aws lambda get-function-url-config --function-name $(LAMBDA_AND_CONTAINER_NAME) | jq .FunctionUrl
+
 # Test the lambda function we created with a sample payload
 test_lambda:
 	aws lambda invoke \
@@ -79,10 +93,3 @@ test_lambda:
 	--cli-binary-format raw-in-base64-out lambda.out
 
 	cat lambda.out
-
-# deploy_api:
-# 	echo "wait 10 seconds for lambda..."
-# 	$(shell sleep 10)
-# 	bash deploy_api.sh \
-# 	$(LAMBDA_AND_CONTAINER_NAME) \
-# 	$(shell aws iam get-role --role-name $(LAMBDA_ROLE_NAME) --output json | jq -r '.Role.Arn')
