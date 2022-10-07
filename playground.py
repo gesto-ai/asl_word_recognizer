@@ -127,6 +127,10 @@ def load_inception_model(device=0):
 # %%
 pretrained_model = load_inception_model()
 # %%
-pretrained_model.save("inception_i3d.pt")
+pretrained_model.save("model.pt")
 
+# %%
+torch.jit.load("model.pt")
+# %%
+mdl = torch.jit.load("/Users/dhruv/git/model_serve/artifacts/sign-recognizer/model.pt")
 # %%
