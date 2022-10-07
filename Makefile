@@ -1,3 +1,5 @@
+#### Makefile template taken from: https://github.com/caseyfitz/cookiecutter-disco-pie/blob/main/%7B%7Bcookiecutter.repo_name%7D%7D/Makefile
+
 # NOTE: Asume .env contains
 # AWS_ACCOUNT_ID=123456789
 # AWS_REGION=some-valid-aws-region
