@@ -51,7 +51,9 @@ site/
 
 # model and data artifacts
 
-model/
-data/raw/
-data/clean/
+preprocess/
+checkpoints/
+weights/
+data/
 metrics/
+lightning_logs
