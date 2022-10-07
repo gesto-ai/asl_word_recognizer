@@ -6,8 +6,8 @@
 
 include .env
 
-LAMBDA_AND_CONTAINER_NAME = sign_recognizer
-LAMBDA_ROLE_NAME = sign_recognizer-role
+LAMBDA_AND_CONTAINER_NAME = sign-recognizer
+LAMBDA_ROLE_NAME = sign-recognizer-role
 
 ECR_URI = $(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_REGION).amazonaws.com
 IMAGE_URI = $(ECR_URI)/$(LAMBDA_AND_CONTAINER_NAME)
@@ -52,3 +52,37 @@ create_lambda_role:
 	aws iam attach-role-policy \
 	--role-name $(LAMBDA_ROLE_NAME) \
 	--policy-arn arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess
+
+# Create lambda function AND increase timeout AND max out memory
+create_lambda_function:
+	echo "wait 10 seconds for role..."	
+	$(shell sleep 10)
+	aws lambda create-function \
+	--function-name $(LAMBDA_AND_CONTAINER_NAME) \
+	--region $(AWS_REGION) \
+	--package-type Image \
+	--code ImageUri=$(IMAGE_URI):latest \
+	--role $(shell aws iam get-role --role-name $(LAMBDA_ROLE_NAME) --output json | jq -r '.Role.Arn')
+
+	aws lambda update-function-configuration \
+	--function-name $(LAMBDA_AND_CONTAINER_NAME) \
+	--region $(AWS_REGION) \
+	--timeout 60 \
+	--memory-size 10240
+
+# Test the lambda function we created with a sample payload
+test_lambda:
+	aws lambda invoke \
+	--function-name $(LAMBDA_AND_CONTAINER_NAME) \
+	--invocation-type RequestResponse \
+	--payload '{"video_url": "https://drive.google.com/uc?export=download&id=1lWdgnNbkosDJ_7p7_qwyBuKqCYs1yvEI"}' \
+	--cli-binary-format raw-in-base64-out lambda.out
+
+	cat lambda.out
+
+# deploy_api:
+# 	echo "wait 10 seconds for lambda..."
+# 	$(shell sleep 10)
+# 	bash deploy_api.sh \
+# 	$(LAMBDA_AND_CONTAINER_NAME) \
+# 	$(shell aws iam get-role --role-name $(LAMBDA_ROLE_NAME) --output json | jq -r '.Role.Arn')
