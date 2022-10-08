@@ -16,7 +16,7 @@ def handler(event, _context):
     print("INFO inference complete")
     print("INFO pred {}".format(pred_str))
 
-    return {"pred": str(pred_str)}
+    return {"prediction": str(pred_str)}
 
 def _load_video(event):
     event = _from_string(event)
