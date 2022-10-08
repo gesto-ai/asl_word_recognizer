@@ -15,21 +15,20 @@ ECR_URI = $(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_REGION).amazonaws.com
 IMAGE_URI = $(ECR_URI)/$(LAMBDA_AND_CONTAINER_NAME)
 AWS_DOCKERFILE_NAME = api_serverless/Dockerfile
 
-
 ###########################
 # General docker commands
 ###########################
 
-build_image:
+build:
 	docker build -t $(LAMBDA_AND_CONTAINER_NAME) . --file $(AWS_DOCKERFILE_NAME)
 
-build_image_m1:
+build_m1:
 	docker build -t $(LAMBDA_AND_CONTAINER_NAME) . --file $(AWS_DOCKERFILE_NAME) --platform=linux/amd64
 
-run_container: build_image
+run_container: build
 	docker run -p 9000:8080 $(LAMBDA_AND_CONTAINER_NAME):latest
 
-run_container_m1: build_image_m1
+run_container_m1: build_m1
 	docker run -p 9000:8080 $(LAMBDA_AND_CONTAINER_NAME):latest --platform=linux/amd64
 
 ######################
@@ -41,17 +40,17 @@ authenticate_ecr:
 create_ecr_repository: authenticate_ecr
 	aws ecr create-repository --repository-name $(LAMBDA_AND_CONTAINER_NAME) --image-scanning-configuration scanOnPush=true --image-tag-mutability MUTABLE
 
-deploy_to_ecr: build_image authenticate_ecr
+deploy_to_ecr: build authenticate_ecr
 	docker tag  $(LAMBDA_AND_CONTAINER_NAME):latest $(IMAGE_URI):latest
 	docker push $(IMAGE_URI):latest
 
-deploy_to_ecr_m1: build_image_m1 authenticate_ecr
+deploy_to_ecr_m1: build_m1 authenticate_ecr
 	docker tag  $(LAMBDA_AND_CONTAINER_NAME):latest $(IMAGE_URI):latest
 	docker push $(IMAGE_URI):latest
 
 # Fully build an image and deploy it to AWS ECR
-full_ecr_deploy: build_image deploy_to_ecr
-full_ecr_deploy_m1: build_image_m1 deploy_to_ecr_m1
+full_ecr_deploy: build deploy_to_ecr
+full_ecr_deploy_m1: build_m1 deploy_to_ecr_m1
 
 ######################
 # AWS Lambda commands
