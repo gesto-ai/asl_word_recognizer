@@ -45,6 +45,24 @@ Sources:
 - [Notebook with detailed steps to deploy to AWS Lambda](https://github.com/full-stack-deep-learning/fsdl-text-recognizer-2022/blob/main/notebooks/lab99_serverless_aws.ipynb)
 
 
+### Building and testing the backend prediction server
+We can test the prediction server logic without deploying to AWS.
+1. Build the docker image
+```
+# If you're on an M1 mac, run make build_m1 instead
+make build
+```
+2. Run the container locally
+```
+make run
+```
+3. In a different terminal session, run a local test with the demo video by sending a POST request to the running container.
+
+**NOTE:** If you run this in your local machine, it will probably timeout - so make sure to run it in a GPU-powered machine!
+```
+make test
+```
+
 ### Running the deploy process from start to finish
 
 Pre-requisites (for the `sign-recognizer` app, these have already been created):
@@ -64,11 +82,11 @@ The following commands will:
 - Get the status of the Lambda function update
 
 
-- If you’re on an M1 Mac, from `model_server/`, run
+- If you’re on an M1 Mac, run:
 ```
 make full_lambda_deploy_m1
 ```
-- Else, from `model_server/`
+- Else, run:
 ```
 make full_lambda_deploy
 ```
