@@ -33,8 +33,3 @@ def _from_string(event):
         return json.loads(event)
     else:
         return event
-
-
-
-# curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{"msg": "hello"}'
-# curl -XPOST "https://sevowty6mttqlw77sypxj7h5ze0pncnn.lambda-url.us-east-1.on.aws/" -H "Content-Type: application/json" -d '{"video_url": "https://drive.google.com/uc?export=download&id=1lWdgnNbkosDJ_7p7_qwyBuKqCYs1yvEI"}'
