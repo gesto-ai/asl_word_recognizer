@@ -2,6 +2,9 @@ import streamlit as st
 from dotenv import dotenv_values
 from sign_recognizer.predictor_backend import PredictorBackend
 
+# Assumes you have a .env file containing:
+# AWS_LAMBDA_URL=[PUBLIC URL FOR BACKEND SERVICE]
+# If no .env file is found, then this will be an empty OrderedDict, so it shouldn't break anything
 config = dotenv_values(".env") 
 AWS_LAMBDA_URL = None
 if "AWS_LAMBDA_URL" in config:
@@ -29,7 +32,6 @@ if uploaded_video is not None:
     st.video(video_bytes)
     st.write("Uploaded video and stored to disk!")
 
-    st.write("Initializing model")
     if AWS_LAMBDA_URL is None:
         st.write("AWS Lambda URL not found. Initializing model with local code...")
         model = PredictorBackend()
