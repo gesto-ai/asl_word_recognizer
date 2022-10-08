@@ -1,0 +1,19 @@
+# Python
+__pycache__
+.pytest_cache
+
+# notebooks
+.ipynb_checkpoints
+*.nbconvert*.ipynb
+.notebook_test.sh
+
+# Misc
+.aws/credentials
+.DS_Store
+
+# logging
+*.pt
+*.ckpt
+
+# artifacts
+artifacts/
