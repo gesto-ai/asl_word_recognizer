@@ -117,6 +117,8 @@ get_lambda_update_status:
 	aws lambda get-function \
 	--function-name sign-recognizer | jq .Configuration.LastUpdateStatus
 
+create_lambda: create_lambda_role create_lambda_function
+
 update_lambda:
 	aws lambda update-function-code --function-name $(LAMBDA_AND_CONTAINER_NAME) --image-uri $(IMAGE_URI):latest
 
