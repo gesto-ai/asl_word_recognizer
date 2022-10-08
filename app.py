@@ -1,6 +1,6 @@
 import streamlit as st
 from dotenv import dotenv_values
-from sign_recognizer.predictor_backend import PredictorBackend
+from predictor_backend import PredictorBackend
 
 # Assumes you have a .env file containing:
 # AWS_LAMBDA_URL=[PUBLIC URL FOR BACKEND SERVICE]
