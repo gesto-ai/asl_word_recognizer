@@ -7,7 +7,7 @@ In a virtual environment (this was tested in a `conda` environment), install the
 pip install -r requirements.txt
 ```
 
-## Steps to use the Sign Recognizer script
+## Using the Sign Recognizer script
 
 ### Step 1: Get the model weights from the Lambda Labs VM
 
@@ -29,7 +29,7 @@ python sign_recognizer.py /path/to/video.mp4
 You can download a sample video file from [here](https://discord.com/channels/@me/1017414703133237298/1024513846427262976).
 
 
-## Steps to run the Streamlit app (connected to the Sign Recognizer)
+## Running the Streamlit app (connected to the Sign Recognizer)
 
 After you have gotten the model weights from Step 1 of running the sign recognizer script, run:
 
@@ -37,15 +37,7 @@ After you have gotten the model weights from Step 1 of running the sign recogniz
 streamlit run app.py
 ```
 
-## Steps to deploy model code
-
-Sources: 
-- [Creating Lambda container images](https://docs.aws.amazon.com/lambda/latest/dg/images-create.html)
-- [Deploying Lambda functions as container images](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-images.html)
-- [Notebook with detailed steps to deploy to AWS Lambda](https://github.com/full-stack-deep-learning/fsdl-text-recognizer-2022/blob/main/notebooks/lab99_serverless_aws.ipynb)
-
-
-### Building and testing the backend prediction server
+## Building and testing the backend prediction server
 We can test the prediction server logic without deploying to AWS.
 1. Build the docker image
 ```
@@ -62,6 +54,13 @@ make run
 ```
 make test
 ```
+
+## Deploy model code to AWS ECR/Lambda
+
+Sources: 
+- [Creating Lambda container images](https://docs.aws.amazon.com/lambda/latest/dg/images-create.html)
+- [Deploying Lambda functions as container images](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-images.html)
+- [Notebook with detailed steps to deploy to AWS Lambda](https://github.com/full-stack-deep-learning/fsdl-text-recognizer-2022/blob/main/notebooks/lab99_serverless_aws.ipynb)
 
 ### Running the deploy process from start to finish
 
