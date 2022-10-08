@@ -25,11 +25,13 @@ build:
 build_m1:
 	docker build -t $(LAMBDA_AND_CONTAINER_NAME) . --file $(AWS_DOCKERFILE_NAME) --platform=linux/amd64
 
-run_container: build
+run:
 	docker run -p 9000:8080 $(LAMBDA_AND_CONTAINER_NAME):latest
 
-run_container_m1: build_m1
-	docker run -p 9000:8080 $(LAMBDA_AND_CONTAINER_NAME):latest --platform=linux/amd64
+test_local:
+	curl -i -XPOST \
+	"http://localhost:9000/2015-03-31/functions/function/invocations" \
+	-d '{"video_url": "https://drive.google.com/uc?export=download&id=1lWdgnNbkosDJ_7p7_qwyBuKqCYs1yvEI"}'
 
 ######################
 # AWS ECR commands
