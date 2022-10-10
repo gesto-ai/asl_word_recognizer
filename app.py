@@ -30,6 +30,14 @@ if uploaded_video is not None:
     res = pretrained_model.predict(video_filepath)
     st.write(f"Final prediction: {res}")
     st.write(f"Expected label: {pretrained_model.mapping[label]}")
+    
+    
+    correctness_state = st.selectbox('Would you like to submit feedback?',
+                ('Predicted word is correct!', 'Predicted word is incorrect.'))    
+    if correctness_state == 'Predicted word is incorrect.':
+        st.write("Please tell us what the correct word was. Check back soon for an updated model that learns from your feedback")
+        correct_label = st.text_input('Enter word here', "Hello")
+        st.write('The current correct_label', correct_label)
 
 
     
