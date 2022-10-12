@@ -18,9 +18,10 @@ from sign_recognizer.model.inception3d import *
 
 STAGED_MODEL_DIRNAME = Path(__file__).resolve().parent / "artifacts" / "sign-recognizer"
 MODEL_FILE = "model.pt"
+FULL_MODEL_PATH = STAGED_MODEL_DIRNAME / MODEL_FILE
 
-if not path.exists(STAGED_MODEL_DIRNAME / MODEL_FILE):
-    raise FileNotFoundError(f"Torchscript model file not found! Expected: {STAGED_MODEL_DIRNAME / MODEL_FILE}")
+if not path.exists(FULL_MODEL_PATH):
+    raise FileNotFoundError(f"Torchscript model file not found! Expected: {FULL_MODEL_PATH}")
 
 LABEL_MAPPING_PATH = (
     Path(__file__).resolve().parent / "data_processing" / "wlasl_class_list.txt"
@@ -32,16 +33,17 @@ class ASLWordRecognizer:
 
     def __init__(self, model_path=None, mapping_path=None):
         if model_path is None:
-            model_path = STAGED_MODEL_DIRNAME / MODEL_FILE
+            model_path = FULL_MODEL_PATH
+
             print(f"Found torchscript model path: {model_path}")
 
-        print("loading model")
+        print("Loading model...")
         self.model = torch.jit.load(model_path)
 
         if mapping_path is None:
             mapping_path = LABEL_MAPPING_PATH
 
-        print("loading mapping")
+        print("Loading label mapping...")
         self.mapping = load_mapping(mapping_path)
 
     @torch.no_grad()
