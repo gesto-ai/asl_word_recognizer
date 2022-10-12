@@ -2,58 +2,58 @@
 from model.inception3d import *
 import torch.nn as nn
 
-# # %%
-# sm = torch.jit.script(
-#     torch.nn.MaxPool3d(kernel_size=[3, 3, 3], stride=(1, 1, 1), padding=0)
-# )
-# print("MaxPool3D compiled", sm)
-# # %%
-# sm = torch.jit.script(
-#     MaxPool3dSamePadding(kernel_size=[3, 3, 3], stride=(1, 1, 1), padding=0)
-# )
-# print("MaxPool3DSamePadding compiled", sm)
-# # %%
-# sm.save("maxpool3dsamepadding.pt")
-# print("Model saved successfully")
+# %%
+sm = torch.jit.script(
+    torch.nn.MaxPool3d(kernel_size=[3, 3, 3], stride=(1, 1, 1), padding=0)
+)
+print("MaxPool3D compiled", sm)
+# %%
+sm = torch.jit.script(
+    MaxPool3dSamePadding(kernel_size=[3, 3, 3], stride=(1, 1, 1), padding=0)
+)
+print("MaxPool3DSamePadding compiled", sm)
+# %%
+sm.save("maxpool3dsamepadding.pt")
+print("Model saved successfully")
 
-# # %%
-# mdl = torch.jit.load("maxpool3dsamepadding.pt")
-# print("Model reloaded successfully", mdl)
+# %%
+mdl = torch.jit.load("maxpool3dsamepadding.pt")
+print("Model reloaded successfully", mdl)
 
-# # %%
-# sm = torch.jit.script(
-#     Unit3D(
-#         in_channels=3,
-#         output_channels=64,
-#         kernel_shape=[7, 7, 7],
-#         stride=(2, 2, 2),
-#         padding=(3, 3, 3),
-#         name="whatever",
-#     )
-# )
-# print("Unit3D compiled", sm)
-# # %%
-# sm.save("unit3d.pt")
-# print("Model saved successfully")
+# %%
+sm = torch.jit.script(
+    Unit3D(
+        in_channels=3,
+        output_channels=64,
+        kernel_shape=[7, 7, 7],
+        stride=(2, 2, 2),
+        padding=(3, 3, 3),
+        name="whatever",
+    )
+)
+print("Unit3D compiled", sm)
+# %%
+sm.save("unit3d.pt")
+print("Model saved successfully")
 
-# # %%
-# mdl = torch.jit.load("unit3d.pt")
-# print("Model reloaded successfully", mdl)
+# %%
+mdl = torch.jit.load("unit3d.pt")
+print("Model reloaded successfully", mdl)
 
-# # %%
-# sm = torch.jit.script(
-#     InceptionModule(
-#         in_channels=192, out_channels=[64, 96, 128, 16, 32, 32], name="doesnotmatter"
-#     )
-# )
-# print("Inception Module compiled", sm)
-# # %%
-# sm.save("inception_module.pt")
-# print("Model saved successfully")
+# %%
+sm = torch.jit.script(
+    InceptionModule(
+        in_channels=192, out_channels=[64, 96, 128, 16, 32, 32], name="doesnotmatter"
+    )
+)
+print("Inception Module compiled", sm)
+# %%
+sm.save("inception_module.pt")
+print("Model saved successfully")
 
-# # %%
-# mdl = torch.jit.load("inception_module.pt")
-# print("Model reloaded successfully", mdl)
+# %%
+mdl = torch.jit.load("inception_module.pt")
+print("Model reloaded successfully", mdl)
 
 # %%
 mdl = InceptionI3d(400, in_channels=3)
