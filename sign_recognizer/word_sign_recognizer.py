@@ -38,8 +38,6 @@ class ASLWordRecognizer:
     def __init__(
         self,
         model_path=None,
-        id3_model_path=None,
-        wlasl_model_path=None,
         mapping_path=None,
         num_classes=None,
     ):
