@@ -20,15 +20,15 @@ from sign_recognizer.model.inception3d import *
 BASE_DIRNAME = Path(__file__).resolve().parent
 ARTIFACTS_DIRNAME = BASE_DIRNAME / "artifacts"
 
-# Then here we only define the subdirectories/filenames of the objects in the sign_recognizer/artifacts folder
-ID3_PRETRAINED_WEIGHTS_PATH = "models/WLASL/weights/rgb_imagenet.pt"
-WLASL_PRETRAINED_WEIGHTS_PATH = "models/WLASL/archived/asl100/FINAL_nslt_100_iters=896_top1=65.89_top5=84.11_top10=89.92.pt"
+# # Then here we only define the subdirectories/filenames of the objects in the sign_recognizer/artifacts folder
+# ID3_PRETRAINED_WEIGHTS_PATH = "models/WLASL/weights/rgb_imagenet.pt"
+# WLASL_PRETRAINED_WEIGHTS_PATH = "models/WLASL/archived/asl100/FINAL_nslt_100_iters=896_top1=65.89_top5=84.11_top10=89.92.pt"
 
 # Mapping file from label numbers to actual text
 LABEL_MAPPING_PATH = BASE_DIRNAME / "data_processing" / "wlasl_class_list.txt"
 NUM_CLASSES = 100
 
-STAGED_MODEL_DIRNAME = Path(__file__).resolve().parent / "artifacts" / "sign-recognizer"
+STAGED_MODEL_DIRNAME = BASE_DIRNAME / "artifacts" / "sign-recognizer"
 MODEL_FILE = "model.pt"
 
 
