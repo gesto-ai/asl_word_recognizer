@@ -39,9 +39,11 @@ streamlit run app.py
 
 ## Building and testing the backend prediction server
 We can test the prediction server logic without deploying to AWS.
+
+0. First, comment out the line `include .env` in the Makefile, unless you have a `.env` file with the expected information.
 1. Build the docker image
 ```
-# If you're on an M1 mac, run make build_m1 instead
+# If you're on an M1 mac, run `make build_m1` instead
 make build
 ```
 2. Run the container locally
@@ -52,7 +54,7 @@ make run
 
 **NOTE:** If you run this in your local machine, it will probably timeout - so make sure to run it in a GPU-powered machine!
 ```
-make test
+make test_local
 ```
 
 ## Deploy model code to AWS ECR/Lambda
