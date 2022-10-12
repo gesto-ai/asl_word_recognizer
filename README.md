@@ -64,7 +64,10 @@ Sources:
 - [Deploying Lambda functions as container images](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-images.html)
 - [Notebook with detailed steps to deploy to AWS Lambda](https://github.com/full-stack-deep-learning/fsdl-text-recognizer-2022/blob/main/notebooks/lab99_serverless_aws.ipynb)
 
-### Running the deploy process from start to finish
+### Running the deploy process from start to finish (Currently not supported unless you have an AWS acccount connected)
+
+Pre-pre requisites:
+- Have an AWS account, with a secret key/secret access key
 
 Pre-requisites (for the `sign-recognizer` app, these have already been created):
 - Create a repository in the AWS Elastic Container Registry (ECR)
