@@ -1,5 +1,5 @@
 """Detects a word from the provided ASL video.
-Example usage as a script:
+Example usage as a script (currently NOT working due to relative import path errors):
   python sign_recognizer/word_sign_recognizer.py \
     /path/to/video.mp4
   python sign_recognizer/word_sign_recognizer.py \
