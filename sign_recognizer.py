@@ -19,7 +19,9 @@ from model.inception3d import *
 STAGED_MODEL_DIRNAME = Path(__file__).resolve().parent / "artifacts" / "sign-recognizer"
 MODEL_FILE = "model.pt"
 
-LABEL_MAPPING_PATH = "./data_processing/wlasl_class_list.txt"
+LABEL_MAPPING_PATH = (
+    Path(__file__).resolve().parent / "data_processing" / "wlasl_class_list.txt"
+)
 
 
 class ASLWordRecognizer:

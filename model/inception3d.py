@@ -1,14 +1,18 @@
+import os
+import sys
+from collections import OrderedDict
+from functools import partial
 from typing import List, Optional, Tuple, Union
+
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
 
-import numpy as np
 
-import os
-import sys
-from collections import OrderedDict
+def default_activation(x: torch.Tensor) -> torch.Tensor:
+    return x
 
 
 class MaxPool3dSamePadding(nn.Module):
@@ -60,7 +64,7 @@ class Unit3D(nn.Module):
         kernel_shape: Tuple[int] = (1, 1, 1),
         stride: Tuple[int] = (1, 1, 1),
         padding: int = 0,
-        activation_fn: Optional[str] = "relu",
+        use_activation: bool = True,
         use_batch_norm: bool = True,
         use_bias: bool = False,
         name: str = "unit_3d",
@@ -73,7 +77,7 @@ class Unit3D(nn.Module):
         self._kernel_shape = kernel_shape
         self._stride = stride
         self._use_batch_norm = use_batch_norm
-        self._activation_fn = activation_fn
+        # self._activation_fn = activation_fn
         self._use_bias = use_bias
         self.name = name
         self.padding = padding
@@ -88,6 +92,8 @@ class Unit3D(nn.Module):
         )
 
         self.bn = nn.BatchNorm3d(self._output_channels, eps=0.001, momentum=0.01)
+
+        self.use_activation = use_activation
 
     def compute_pad(self, dim: int, s: int):
         if s % self._stride[dim] == 0:
@@ -118,9 +124,10 @@ class Unit3D(nn.Module):
         if self._use_batch_norm:
             x = self.bn(x)
 
-        if self._activation_fn is not None:
-            fn = getattr(F, self._activation_fn)
-            x = fn(x)
+        if self.use_activation:
+            x = F.relu(x)
+        else:
+            pass
 
         return x
 
@@ -174,7 +181,7 @@ class InceptionModule(nn.Module):
         )
         self.name = name
 
-    def forward(self, x: Tensor):
+    def forward(self, x: torch.Tensor):
         b0 = self.b0(x)
         b1 = self.b1b(self.b1a(x))
         b2 = self.b2b(self.b2a(x))
@@ -392,7 +399,7 @@ class InceptionI3d(nn.Module):
             output_channels=self._num_classes,
             kernel_shape=[1, 1, 1],
             padding=0,
-            activation_fn=None,
+            use_activation=False,
             use_batch_norm=False,
             use_bias=True,
             name="logits",
@@ -409,7 +416,7 @@ class InceptionI3d(nn.Module):
             output_channels=self._num_classes,
             kernel_shape=[1, 1, 1],
             padding=0,
-            activation_fn=None,
+            use_activation=False,
             use_batch_norm=False,
             use_bias=True,
             name="logits",
