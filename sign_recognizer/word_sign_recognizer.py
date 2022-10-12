@@ -6,6 +6,7 @@ Example usage as a script:
     https://fsdl-public-assets.s3-us-west-2.amazonaws.com/path/to/video.mp4
 """
 import argparse
+from os import path
 from pathlib import Path
 from typing import Sequence, Union
 
@@ -23,6 +24,13 @@ ARTIFACTS_DIRNAME = BASE_DIRNAME / "artifacts"
 # Then here we only define the subdirectories/filenames of the objects in the sign_recognizer/artifacts folder
 ID3_PRETRAINED_WEIGHTS_PATH = "models/WLASL/weights/rgb_imagenet.pt"
 WLASL_PRETRAINED_WEIGHTS_PATH = "models/WLASL/archived/asl100/FINAL_nslt_100_iters=896_top1=65.89_top5=84.11_top10=89.92.pt"
+
+# Make sure model weights paths exist
+if not path.exists(ARTIFACTS_DIRNAME / ID3_PRETRAINED_WEIGHTS_PATH):
+    raise FileNotFoundError(f"Inception I3D model weights file not found! Expecting: {ARTIFACTS_DIRNAME / ID3_PRETRAINED_WEIGHTS_PATH}")
+
+if not path.exists(ARTIFACTS_DIRNAME / WLASL_PRETRAINED_WEIGHTS_PATH):
+    raise FileNotFoundError(f"WLASL model weights file not found! Expecting: {ARTIFACTS_DIRNAME / WLASL_PRETRAINED_WEIGHTS_PATH}")
 
 # Mapping file from label numbers to actual text
 LABEL_MAPPING_PATH = BASE_DIRNAME / "data_processing" / "wlasl_class_list.txt"
