@@ -132,11 +132,6 @@ def process_video(video_filepath, start_frame, end_frame):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    # parser.add_argument(
-    #     "model_path",
-    #     type=str,
-    #     help="location of pytorch torchscript model",
-    # )
     parser.add_argument(
         "filename",
         type=str,
