@@ -1,6 +1,6 @@
 import streamlit as st
 
-from sign_recognizer import *
+from sign_recognizer.word_sign_recognizer import ASLWordRecognizer
 
 st.header("Welcome to Gesto AI")
 st.write("Upload any video of a sign and get a predicted word as text! The demo video for this app is 05727.mp4 from the WLASL dataset.")
@@ -22,7 +22,7 @@ if uploaded_video is not None:
     st_video = open(video_filepath, 'rb')
     video_bytes = st_video.read()
     st.video(video_bytes)
-    st.write("Uploaded video and stored to disk!")
+    st.write("Uploaded video and stored to disk! Getting predictions...")
 
     # Temporarily hard coded for the video we're uploading/testing
     label = 3

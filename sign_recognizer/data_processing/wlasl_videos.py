@@ -1,7 +1,3 @@
-import json
-import os
-import os.path
-
 import numbers
 import cv2
 import numpy as np
@@ -23,10 +19,8 @@ def video_to_tensor(pic):
 
 
 def load_rgb_frames_from_video_dataset(video_path, start=0, num=-1):
-    # video_path = os.path.join(vid_root, vid + '.mp4')
 
     vidcap = cv2.VideoCapture(video_path)
-    # vidcap = cv2.VideoCapture('/home/dxli/Desktop/dm_256.mp4')
 
     frames = []
     if num == -1:
