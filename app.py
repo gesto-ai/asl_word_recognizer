@@ -16,9 +16,19 @@ S3_BUCKET_NAME = "sign-recognizer"
 S3_UPLOADED_VIDEOS_FOLDER = "new-videos"
 
 st.header("Welcome to Gesto AI")
-st.write("Upload any video of a sign and get a predicted word as text! The demo video for this app is [05727.mp4](https://sign-recognizer.s3.amazonaws.com/new-videos/05727.mp4) (prediction = 'before') from the WLASL dataset.")
+st.write("Upload any video of a sign or enter a public video URL and get a predicted word as text! The demo video for this app is [05727.mp4](https://sign-recognizer.s3.amazonaws.com/new-videos/05727.mp4) (prediction = 'before') from the WLASL dataset.")
 
-uploaded_video = st.file_uploader("Upload a video...")
+INP_VIDEO_URL= st.text_input('Please enter a public video URL')
+
+
+
+VID_URL = None  
+full_s3_video_url = None
+
+
+
+
+uploaded_video = st.file_uploader("Or upload a video...")
 
 if uploaded_video is not None:
     # We'll need this path for opening the video with OpenCV
@@ -31,22 +41,32 @@ if uploaded_video is not None:
         f.write(uploaded_video.read()) 
 
     # Open video from disk path - technically not needed because we can feed the bytes-like object to st.video
-    st.video(full_s3_video_url)
     st.write("Uploaded video and stored to S3!")
 
+
+
+if INP_VIDEO_URL != "":
+    VID_URL = INP_VIDEO_URL
+else: VID_URL = full_s3_video_url  
+
+
+
+
+
+if VID_URL is not None:
+    st.video(INP_VIDEO_URL)
     if AWS_LAMBDA_URL is None:
         st.write("AWS Lambda URL not found. Initializing model with local code...")
         model = PredictorBackend()
     else:
         st.write("AWS Lambda URL found! Initializing model with predictor backend...")
         model = PredictorBackend(url=AWS_LAMBDA_URL)
-    
     st.write("Getting prediction...")
-    prediction = model.run(full_s3_video_url)
+    prediction = model.run(VID_URL)
     st.write(f"Final prediction: {prediction}")
 
     # Print the expected label for the demo video
-    if full_s3_video_url == DEMO_VIDEO_URL:
+    if VID_URL == DEMO_VIDEO_URL:
         st.write(f"Expected label for demo: {DEMO_VIDEO_LABEL}")
 
 
