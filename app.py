@@ -5,14 +5,9 @@ import s3fs
 import os
 
 fs = s3fs.S3FileSystem(anon=False)
-
-# Assumes you have a .env file containing:
-# AWS_LAMBDA_URL=[PUBLIC URL FOR BACKEND SERVICE]
-# If no .env file is found, then this will be an empty OrderedDict, so it shouldn't break anything
-config = dotenv_values(".env") 
 AWS_LAMBDA_URL = os.getenv("AWS_LAMBDA_URL")
-if "AWS_LAMBDA_URL" in config:
-    AWS_LAMBDA_URL = config["AWS_LAMBDA_URL"]
+
+# Demo constants
 DEMO_VIDEO_URL = "https://sign-recognizer.s3.amazonaws.com/new-videos/05727.mp4"
 DEMO_VIDEO_LABEL = "before"
 
@@ -21,14 +16,14 @@ S3_BUCKET_NAME = "sign-recognizer"
 S3_UPLOADED_VIDEOS_FOLDER = "new-videos"
 
 st.header("Welcome to Gesto AI")
-st.write("Upload any video of a sign and get a predicted word as text! The demo video for this app is [05727.mp4](https://sign-recognizer.s3.amazonaws.com/new-videos/05727.mp4) from the WLASL dataset.")
+st.write("Upload any video of a sign and get a predicted word as text! The demo video for this app is [05727.mp4](https://sign-recognizer.s3.amazonaws.com/new-videos/05727.mp4) (prediction = 'before') from the WLASL dataset.")
 
 uploaded_video = st.file_uploader("Upload a video...")
 
 if uploaded_video is not None:
     # We'll need this path for opening the video with OpenCV
     short_s3_video_url = f"{S3_BUCKET_NAME}/{S3_UPLOADED_VIDEOS_FOLDER}/{uploaded_video.name}"    
-    full_s3_video_url = f"https://sign-recognizer.s3.amazonaws.com/new-videos/{uploaded_video.name}"
+    full_s3_video_url = f"https://{S3_BUCKET_NAME}.s3.amazonaws.com/{S3_UPLOADED_VIDEOS_FOLDER}/{uploaded_video.name}"
     print(f"Video S3 URL: {full_s3_video_url}")
 
     # Save video to our S3 bucket
