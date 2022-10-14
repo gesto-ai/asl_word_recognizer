@@ -34,9 +34,6 @@ STAGED_MODEL_DIRNAME = ARTIFACTS_DIRNAME/ "sign-recognizer"
 MODEL_FILE = "model.pt"
 FULL_MODEL_PATH = STAGED_MODEL_DIRNAME / MODEL_FILE
 
-if not path.exists(FULL_MODEL_PATH):
-    raise FileNotFoundError(f"Torchscript model file not found! Expected: {FULL_MODEL_PATH}")
-
 
 class ASLWordRecognizer:
     """Recognizes a word from sign in a video."""
@@ -49,7 +46,8 @@ class ASLWordRecognizer:
     ):
         if model_path is None:
             model_path = FULL_MODEL_PATH
-
+            if not path.exists(FULL_MODEL_PATH):
+                raise FileNotFoundError(f"Torchscript model file not found! Expected: {FULL_MODEL_PATH}")
             print(f"Found torchscript model path: {model_path}")
 
         print("Loading model...")
