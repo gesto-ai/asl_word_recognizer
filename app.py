@@ -1,6 +1,10 @@
 import streamlit as st
 from dotenv import dotenv_values
 from predictor_backend import PredictorBackend
+import s3fs
+import os
+
+fs = s3fs.S3FileSystem(anon=False)
 
 # Assumes you have a .env file containing:
 # AWS_LAMBDA_URL=[PUBLIC URL FOR BACKEND SERVICE]
