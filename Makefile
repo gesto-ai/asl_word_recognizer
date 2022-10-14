@@ -6,7 +6,7 @@
 # AWS_ACCESS_KEY=AKBCDEFGHIJKL
 # AWS_SECRET_ACCESS_KEY=qwertyuiopasdfghjklzxcvbnm
 
-# include .env
+include .env
 
 LAMBDA_AND_CONTAINER_NAME = sign-recognizer
 LAMBDA_ROLE_NAME = sign-recognizer-role

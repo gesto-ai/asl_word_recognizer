@@ -9,7 +9,7 @@ config = dotenv_values(".env")
 AWS_LAMBDA_URL = None
 if "AWS_LAMBDA_URL" in config:
     AWS_LAMBDA_URL = config["AWS_LAMBDA_URL"]
-DEMO_VIDEO_URL = "https://drive.google.com/uc?export=download&id=1lWdgnNbkosDJ_7p7_qwyBuKqCYs1yvEI"
+DEMO_VIDEO_URL = "https://sign-recognizer.s3.amazonaws.com/new-videos/05739.mp4"
 DEMO_VIDEO_LABEL = "before"
 
 st.header("Welcome to Gesto AI")
