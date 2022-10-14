@@ -2,9 +2,12 @@
 
 ## Pre-requisites
 
+- Python 3.9
+- A virtual environment
+
 In a virtual environment (this was tested in a `conda` environment), install the required packages from the `requirements.txt` file:
 ```
-pip install -r requirements.txt
+pip install -r requirements/requirements-frontend.txt
 ```
 
 ## Using the Sign Recognizer script
