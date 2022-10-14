@@ -2,7 +2,7 @@ FROM public.ecr.aws/lambda/python:3.9
 
 # Install the function's dependencies using file requirements.txt
 # from your project folder.
-COPY requirements/requirements-dev.txt  ./requirements.txt
+COPY requirements/requirements-backend.txt  ./requirements.txt
 RUN  pip3 install -r requirements.txt
 
 # Copy function code

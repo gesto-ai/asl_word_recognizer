@@ -12,6 +12,7 @@ __pycache__
 .DS_Store
 .env
 *.out
+.streamlit
 
 # logging
 *.pt
@@ -24,3 +25,4 @@ data/
 lightning_logs
 preprocess/
 weights/
+*.mp4

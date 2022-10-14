@@ -28,18 +28,20 @@ def load_rgb_frames_from_video_dataset(video_path: Union[str, Path], start_frame
     if num_frames == -1:
         num_frames = int(vidcap.get(cv2.CAP_PROP_FRAME_COUNT))
 
+    print(f"INFO Number of frames on video: {num_frames}")
     vidcap.set(cv2.CAP_PROP_POS_FRAMES, start_frame)
     for _ in range(num_frames):
         _, img = vidcap.read()
 
-        w, h, _ = img.shape
-        if w < 226 or h < 226:
-            d = 226. - min(w, h)
-            sc = 1 + d / min(w, h)
-            img = cv2.resize(img, dsize=(0, 0), fx=sc, fy=sc)
-        img = (img / 255.) * 2 - 1
+        if img is not None:
+            w, h, _ = img.shape
+            if w < 226 or h < 226:
+                d = 226. - min(w, h)
+                sc = 1 + d / min(w, h)
+                img = cv2.resize(img, dsize=(0, 0), fx=sc, fy=sc)
+            img = (img / 255.) * 2 - 1
 
-        frames.append(img)
+            frames.append(img)
 
     return np.asarray(frames, dtype=np.float32)
 

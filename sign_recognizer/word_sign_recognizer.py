@@ -29,8 +29,10 @@ ARTIFACTS_DIRNAME = BASE_DIRNAME / "artifacts"
 LABEL_MAPPING_PATH = BASE_DIRNAME / "data_processing" / "wlasl_class_list.txt"
 NUM_CLASSES = 100
 
-STAGED_MODEL_DIRNAME = BASE_DIRNAME / "artifacts" / "sign-recognizer"
+# Path to model file
+STAGED_MODEL_DIRNAME = ARTIFACTS_DIRNAME/ "sign-recognizer"
 MODEL_FILE = "model.pt"
+FULL_MODEL_PATH = STAGED_MODEL_DIRNAME / MODEL_FILE
 
 
 class ASLWordRecognizer:
@@ -43,8 +45,9 @@ class ASLWordRecognizer:
         num_classes=None,
     ):
         if model_path is None:
-            model_path = STAGED_MODEL_DIRNAME / MODEL_FILE
-
+            model_path = FULL_MODEL_PATH
+            if not path.exists(FULL_MODEL_PATH):
+                raise FileNotFoundError(f"Torchscript model file not found! Expected: {FULL_MODEL_PATH}")
             print(f"Found torchscript model path: {model_path}")
 
         print("Loading model...")
@@ -75,7 +78,7 @@ class ASLWordRecognizer:
     def predict(self, video_filepath: Union[str, Path]) -> str:
         """Predict/infer word in input video (which can be a file path or url)."""
         print("Processing video...")
-        batched_frames = process_video(video_filepath, 1, 74)
+        batched_frames = process_video(video_filepath)
 
         print("Generating predictions...")
         y_pred = self.predict_on_video(batched_frames)
@@ -126,7 +129,7 @@ def convert_y_label_to_string(y: np.int64, mapping: Sequence[str]) -> str:
     return mapping[y]
 
 
-def process_video(video_filepath, start_frame, end_frame):
+def process_video(video_filepath, start_frame=0, end_frame=-1):
     """
     Args:
         video_filepath: str
