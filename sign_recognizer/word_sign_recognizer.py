@@ -1,11 +1,12 @@
 """Detects a word from the provided ASL video.
-Example usage as a script:
+Example usage as a script (currently NOT working due to relative import path errors):
   python sign_recognizer/word_sign_recognizer.py \
     /path/to/video.mp4
   python sign_recognizer/word_sign_recognizer.py \
     https://fsdl-public-assets.s3-us-west-2.amazonaws.com/path/to/video.mp4
 """
 import argparse
+from os import path
 from pathlib import Path
 from typing import Sequence, Union
 
@@ -18,34 +19,56 @@ from sign_recognizer.model.inception3d import *
 # This defines the parent folder of this file, and adds "/artifacts" to the path string
 # An example would be BASE_DIRNAME = `/Users/dafirebanks/GestoAI/model_serve/sign_recognizer/`
 BASE_DIRNAME = Path(__file__).resolve().parent
-ARTIFACTS_DIRNAME = BASE_DIRNAME / "artifacts" 
+ARTIFACTS_DIRNAME = BASE_DIRNAME / "artifacts"
 
-# Then here we only define the subdirectories/filenames of the objects in the sign_recognizer/artifacts folder
-ID3_PRETRAINED_WEIGHTS_PATH = "models/WLASL/weights/rgb_imagenet.pt"
-WLASL_PRETRAINED_WEIGHTS_PATH = "models/WLASL/archived/asl100/FINAL_nslt_100_iters=896_top1=65.89_top5=84.11_top10=89.92.pt"
+# # Then here we only define the subdirectories/filenames of the objects in the sign_recognizer/artifacts folder
+# ID3_PRETRAINED_WEIGHTS_PATH = "models/WLASL/weights/rgb_imagenet.pt"
+# WLASL_PRETRAINED_WEIGHTS_PATH = "models/WLASL/archived/asl100/FINAL_nslt_100_iters=896_top1=65.89_top5=84.11_top10=89.92.pt"
 
 # Mapping file from label numbers to actual text
 LABEL_MAPPING_PATH = BASE_DIRNAME / "data_processing" / "wlasl_class_list.txt"
 NUM_CLASSES = 100
 
+STAGED_MODEL_DIRNAME = BASE_DIRNAME / "artifacts" / "sign-recognizer"
+MODEL_FILE = "model.pt"
+
 
 class ASLWordRecognizer:
     """Recognizes a word from sign in a video."""
 
-    def __init__(self, id3_model_path=None, wlasl_model_path=None, mapping_path=None, num_classes=None):
+    def __init__(
+        self,
+        model_path=None,
+        mapping_path=None,
+        num_classes=None,
+    ):
+        if model_path is None:
+            model_path = STAGED_MODEL_DIRNAME / MODEL_FILE
+
+            print(f"Found torchscript model path: {model_path}")
+
+        print("Loading model...")
+        self.model = torch.jit.load(model_path)
+
         if mapping_path is None:
             mapping_path = LABEL_MAPPING_PATH
-        if id3_model_path is None:
-            id3_model_path = ARTIFACTS_DIRNAME / ID3_PRETRAINED_WEIGHTS_PATH
-        if wlasl_model_path is None:
-            wlasl_model_path = ARTIFACTS_DIRNAME / WLASL_PRETRAINED_WEIGHTS_PATH
+
         if num_classes is None:
             num_classes = NUM_CLASSES
-        
-        print("Loading model...")
-        self.model = load_inception_model(id3_model_path, wlasl_model_path, num_classes)
+
+        # if id3_model_path is None:
+        #     id3_model_path = ARTIFACTS_DIRNAME / ID3_PRETRAINED_WEIGHTS_PATH
+        # if wlasl_model_path is None:
+        #     wlasl_model_path = ARTIFACTS_DIRNAME / WLASL_PRETRAINED_WEIGHTS_PATH
+
+        # print("Loading model...")
+        # self.model = load_inception_model(id3_model_path, wlasl_model_path, num_classes)
 
         print("Loading mapping...")
+
+        if mapping_path is None:
+            mapping_path = LABEL_MAPPING_PATH
+
         self.mapping = load_mapping(mapping_path)
 
     @torch.no_grad()
@@ -59,7 +82,7 @@ class ASLWordRecognizer:
         pred_str = convert_y_label_to_string(y=y_pred[-1], mapping=self.mapping)
 
         return pred_str
-    
+
     @torch.no_grad()
     def predict_on_video(self, batched_frames):
         """Predict word in video passed as a tensor of frames
@@ -86,19 +109,22 @@ class ASLWordRecognizer:
         # Return the top prediction
         return out_labels
 
+
 def load_mapping(mapping_path):
     mapping = {}
     with open(mapping_path, "r") as f:
         labels: list = f.readlines()
-    
+
     for label in labels:
         idx, ann = label.split("\t")
         mapping[int(idx)] = ann.replace("\n", "")
-    
+
     return mapping
+
 
 def convert_y_label_to_string(y: np.int64, mapping: Sequence[str]) -> str:
     return mapping[y]
+
 
 def process_video(video_filepath, start_frame, end_frame):
     """
@@ -129,15 +155,16 @@ def process_video(video_filepath, start_frame, end_frame):
     return batched_frames
 
 
-
-def load_inception_model(id3_pretrained_weights_path, wlasl_pretrained_weights_path, num_classes, device=0):
+def load_inception_model(
+    id3_pretrained_weights_path, wlasl_pretrained_weights_path, num_classes, device=0
+):
     """
     Args:
         device: int
     Returns:
         pretrained_i3d_model: InceptionI3d
     """
-    
+
     # Initialize model
     pretrained_i3d_model = InceptionI3d(400, in_channels=3)
 
@@ -148,7 +175,9 @@ def load_inception_model(id3_pretrained_weights_path, wlasl_pretrained_weights_p
     pretrained_i3d_model.replace_logits(num_classes)
 
     # Load the weights for the fine-tuned model on ASL
-    pretrained_i3d_model.load_state_dict(torch.load(wlasl_pretrained_weights_path, map_location=torch.device('cpu')))
+    pretrained_i3d_model.load_state_dict(
+        torch.load(wlasl_pretrained_weights_path, map_location=torch.device("cpu"))
+    )
 
     # Move to GPU
     # i3d.cuda(device=device)

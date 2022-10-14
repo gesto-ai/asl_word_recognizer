@@ -10,6 +10,8 @@ __pycache__
 # Misc
 .aws/credentials
 .DS_Store
+.env
+*.out
 
 # logging
 *.pt
