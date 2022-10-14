@@ -20,10 +20,10 @@ scp -r team_046@150.136.219.226:/home/team_046/models ./
 ```
 
 
-### Step 2: run `sign_recognizer.py`
+### Step 2: run `sign_recognizer.py` (currently not working)
 
 ```
-python sign_recognizer.py /path/to/video.mp4
+python sign_recognizer/word_sign_recognizer.py /path/to/video.mp4
 ```
 
 You can download a sample video file from [here](https://discord.com/channels/@me/1017414703133237298/1024513846427262976).
@@ -39,9 +39,11 @@ streamlit run app.py
 
 ## Building and testing the backend prediction server
 We can test the prediction server logic without deploying to AWS.
+
+0. First, comment out the line `include .env` in the Makefile, unless you have a `.env` file with the expected information.
 1. Build the docker image
 ```
-# If you're on an M1 mac, run make build_m1 instead
+# If you're on an M1 mac, run `make build_m1` instead
 make build
 ```
 2. Run the container locally
@@ -52,7 +54,7 @@ make run
 
 **NOTE:** If you run this in your local machine, it will probably timeout - so make sure to run it in a GPU-powered machine!
 ```
-make test
+make test_local
 ```
 
 ## Deploy model code to AWS ECR/Lambda
@@ -62,7 +64,10 @@ Sources:
 - [Deploying Lambda functions as container images](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-images.html)
 - [Notebook with detailed steps to deploy to AWS Lambda](https://github.com/full-stack-deep-learning/fsdl-text-recognizer-2022/blob/main/notebooks/lab99_serverless_aws.ipynb)
 
-### Running the deploy process from start to finish
+### Running the deploy process from start to finish (Currently not supported unless you have an AWS acccount connected)
+
+Pre-pre requisites:
+- Have an AWS account, with a secret key/secret access key
 
 Pre-requisites (for the `sign-recognizer` app, these have already been created):
 - Create a repository in the AWS Elastic Container Registry (ECR)

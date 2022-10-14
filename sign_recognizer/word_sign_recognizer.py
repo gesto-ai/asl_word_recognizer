@@ -1,11 +1,12 @@
 """Detects a word from the provided ASL video.
-Example usage as a script:
+Example usage as a script (currently NOT working due to relative import path errors):
   python sign_recognizer/word_sign_recognizer.py \
     /path/to/video.mp4
   python sign_recognizer/word_sign_recognizer.py \
     https://fsdl-public-assets.s3-us-west-2.amazonaws.com/path/to/video.mp4
 """
 import argparse
+from os import path
 from pathlib import Path
 from typing import Sequence, Union
 
@@ -44,7 +45,9 @@ class ASLWordRecognizer:
         if model_path is None:
             model_path = STAGED_MODEL_DIRNAME / MODEL_FILE
 
-        print("loading model")
+            print(f"Found torchscript model path: {model_path}")
+
+        print("Loading model...")
         self.model = torch.jit.load(model_path)
 
         if mapping_path is None:
@@ -191,11 +194,6 @@ def load_inception_model(
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    # parser.add_argument(
-    #     "model_path",
-    #     type=str,
-    #     help="location of pytorch torchscript model",
-    # )
     parser.add_argument(
         "filename",
         type=str,
