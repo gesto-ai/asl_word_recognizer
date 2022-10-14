@@ -27,7 +27,7 @@ if uploaded_video is not None:
     print(f"Video filepath: {video_filepath}")
 
     # Save video to disk
-    with open(video_filepath, mode='wb') as f:
+    with fs.open(f"sign-recognizer/new-videos/{video_filepath}", mode='wb') as f:
         f.write(uploaded_video.read()) 
 
     # Open video from disk path - technically not needed because we can feed the bytes-like object to st.video
