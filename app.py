@@ -10,7 +10,7 @@ fs = s3fs.S3FileSystem(anon=False)
 # AWS_LAMBDA_URL=[PUBLIC URL FOR BACKEND SERVICE]
 # If no .env file is found, then this will be an empty OrderedDict, so it shouldn't break anything
 config = dotenv_values(".env") 
-AWS_LAMBDA_URL = None
+AWS_LAMBDA_URL = os.getenv("AWS_LAMBDA_URL")
 if "AWS_LAMBDA_URL" in config:
     AWS_LAMBDA_URL = config["AWS_LAMBDA_URL"]
 DEMO_VIDEO_URL = "https://drive.google.com/uc?export=download&id=1lWdgnNbkosDJ_7p7_qwyBuKqCYs1yvEI"
