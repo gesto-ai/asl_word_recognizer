@@ -18,43 +18,31 @@ S3_UPLOADED_VIDEOS_FOLDER = "new-videos"
 st.header("Welcome to Gesto AI")
 st.write("Upload any video of a sign or enter a public video URL and get a predicted word as text! The demo video for this app is [05727.mp4](https://sign-recognizer.s3.amazonaws.com/new-videos/05727.mp4) (prediction = 'before') from the WLASL dataset.")
 
-INP_VIDEO_URL= st.text_input('Please enter a public video URL')
+input_video_url = st.text_input('Please enter a public video URL')
+video_url = None
 
-
-
-VID_URL = None  
-full_s3_video_url = None
-
-
-
-
-uploaded_video = st.file_uploader("Or upload a video...")
-
+# Option 1: Video file upload
+uploaded_video = st.file_uploader("Or upload an .mp4 video file")
 if uploaded_video is not None:
     # We'll need this path for opening the video with OpenCV
     short_s3_video_url = f"{S3_BUCKET_NAME}/{S3_UPLOADED_VIDEOS_FOLDER}/{uploaded_video.name}"    
-    full_s3_video_url = f"https://{S3_BUCKET_NAME}.s3.amazonaws.com/{S3_UPLOADED_VIDEOS_FOLDER}/{uploaded_video.name}"
-    print(f"Video S3 URL: {full_s3_video_url}")
+    video_url = f"https://{S3_BUCKET_NAME}.s3.amazonaws.com/{S3_UPLOADED_VIDEOS_FOLDER}/{uploaded_video.name}"
+    print(f"Video S3 URL: {video_url}")
 
     # Save video to our S3 bucket
     with fs.open(short_s3_video_url, mode='wb') as f:
         f.write(uploaded_video.read()) 
 
     # Open video from disk path - technically not needed because we can feed the bytes-like object to st.video
-    st.write("Uploaded video and stored to S3!")
+    st.write(f"Uploaded video and stored to S3! URL: [{video_url}]({video_url})")
 
+# Option 2: Video URL 
+elif input_video_url:
+    print(f"Public URL for video: {input_video_url}")
+    video_url = input_video_url
 
-
-if INP_VIDEO_URL != "":
-    VID_URL = INP_VIDEO_URL
-else: VID_URL = full_s3_video_url  
-
-
-
-
-
-if VID_URL is not None:
-    st.video(INP_VIDEO_URL)
+if video_url is not None:
+    st.video(video_url)
     if AWS_LAMBDA_URL is None:
         st.write("AWS Lambda URL not found. Initializing model with local code...")
         model = PredictorBackend()
@@ -62,11 +50,11 @@ if VID_URL is not None:
         st.write("AWS Lambda URL found! Initializing model with predictor backend...")
         model = PredictorBackend(url=AWS_LAMBDA_URL)
     st.write("Getting prediction...")
-    prediction = model.run(VID_URL)
+    prediction = model.run(video_url)
     st.write(f"Final prediction: {prediction}")
 
     # Print the expected label for the demo video
-    if VID_URL == DEMO_VIDEO_URL:
+    if video_url == DEMO_VIDEO_URL:
         st.write(f"Expected label for demo: {DEMO_VIDEO_LABEL}")
 
 
