@@ -23,6 +23,11 @@ video_url = None
 
 # Option 1: Video file upload
 uploaded_video = st.file_uploader("Or upload an .mp4 video file")
+st.write("Sample URLs:")
+st.code("https://sign-recognizer.s3.amazonaws.com/new-videos/05732.mp4", language="html")
+st.code("https://sign-recognizer.s3.amazonaws.com/new-videos/05731.mp4", language="html")
+
+
 if uploaded_video is not None:
     # We'll need this path for opening the video with OpenCV
     short_s3_video_url = f"{S3_BUCKET_NAME}/{S3_UPLOADED_VIDEOS_FOLDER}/{uploaded_video.name}"    
