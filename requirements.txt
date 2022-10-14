@@ -1,0 +1,7 @@
+numpy==1.23.1
+opencv-python-headless==4.6.0.66
+python-dotenv==0.21.0
+requests==2.28.1
+streamlit==1.13.0
+torch==1.12.1
+torchvision==0.13.1
