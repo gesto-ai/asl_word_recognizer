@@ -23,9 +23,7 @@ video_url = None
 
 # Option 1: Video file upload
 uploaded_video = st.file_uploader("Or upload an .mp4 video file")
-st.write("Sample URLs:")
-st.code("https://sign-recognizer.s3.amazonaws.com/new-videos/05732.mp4", language="html")
-st.code("https://sign-recognizer.s3.amazonaws.com/new-videos/05731.mp4", language="html")
+
 
 
 if uploaded_video is not None:
@@ -62,5 +60,7 @@ if video_url is not None:
     if video_url == DEMO_VIDEO_URL:
         st.write(f"Expected label for demo: {DEMO_VIDEO_LABEL}")
 
-
+st.write("Sample URLs:")
+st.code("https://sign-recognizer.s3.amazonaws.com/new-videos/05732.mp4", language="html")
+st.code("https://sign-recognizer.s3.amazonaws.com/new-videos/05731.mp4", language="html")
     
