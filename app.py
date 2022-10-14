@@ -21,7 +21,7 @@ S3_BUCKET_NAME = "sign-recognizer"
 S3_UPLOADED_VIDEOS_FOLDER = "new-videos"
 
 st.header("Welcome to Gesto AI")
-st.write("Upload any video of a sign and get a predicted word as text! The demo video for this app is `https://sign-recognizer.s3.amazonaws.com/new-videos/05727.mp4` from the WLASL dataset.")
+st.write("Upload any video of a sign and get a predicted word as text! The demo video for this app is [05727.mp4](https://sign-recognizer.s3.amazonaws.com/new-videos/05727.mp4) from the WLASL dataset.")
 
 uploaded_video = st.file_uploader("Upload a video...")
 
