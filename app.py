@@ -32,7 +32,7 @@ if uploaded_video is not None:
         f.write(uploaded_video.read()) 
 
     # Open video from disk path - technically not needed because we can feed the bytes-like object to st.video
-    st_video = open(video_filepath, 'rb')
+    st_video = open(f"https://sign-recognizer.s3.amazonaws.com/new-videos/{uploaded_video.name}", 'rb')
     video_bytes = st_video.read()
     st.video(video_bytes)
     st.write("Uploaded video and stored to disk!")
