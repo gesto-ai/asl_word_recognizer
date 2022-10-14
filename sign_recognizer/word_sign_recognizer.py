@@ -75,7 +75,7 @@ class ASLWordRecognizer:
     def predict(self, video_filepath: Union[str, Path]) -> str:
         """Predict/infer word in input video (which can be a file path or url)."""
         print("Processing video...")
-        batched_frames = process_video(video_filepath, 1, 74)
+        batched_frames = process_video(video_filepath)
 
         print("Generating predictions...")
         y_pred = self.predict_on_video(batched_frames)
@@ -126,7 +126,7 @@ def convert_y_label_to_string(y: np.int64, mapping: Sequence[str]) -> str:
     return mapping[y]
 
 
-def process_video(video_filepath, start_frame, end_frame):
+def process_video(video_filepath, start_frame=0, end_frame=-1):
     """
     Args:
         video_filepath: str
