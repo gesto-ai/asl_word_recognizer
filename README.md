@@ -11,16 +11,16 @@ pip install -r requirements.txt
 
 ### Step 1: Get the model weights from the Lambda Labs VM
 
-The script currently expects the model weights to be stored in `model_serve/models/`.
+The script currently expects the model weights to be stored in `model_serve/artifacts/sign-recognizer`.
 
 ```
 cd model_serve
 
-scp -r team_046@150.136.219.226:/home/team_046/models ./
+scp -r team_046@150.136.219.226:/home/team_046/models/artifacts .  
 ```
 
 
-### Step 2: run `sign_recognizer.py` (currently not working)
+### [NOT WORKING] Step 2: run `word_sign_recognizer.py`
 
 ```
 python sign_recognizer/word_sign_recognizer.py /path/to/video.mp4
