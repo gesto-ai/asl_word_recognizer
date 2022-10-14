@@ -36,15 +36,15 @@ test_local:
 
 # Should return prediction: "before"
 test_before_sign:
-        curl -i -XPOST \
-        "http://localhost:9001/2015-03-31/functions/function/invocations" \
-        -d '{"video_url": "https://sign-recognizer.s3.amazonaws.com/new-videos/05739.mp4"}'
+	curl -i -XPOST \
+	"http://localhost:9001/2015-03-31/functions/function/invocations" \
+	-d '{"video_url": "https://sign-recognizer.s3.amazonaws.com/new-videos/05739.mp4"}'
 
 # Should return prediction: "last" (wrong prediction) instead of "before" (correct prediction)
 test_wrong_before_sign:
-        curl -i -XPOST \
-        "http://localhost:9001/2015-03-31/functions/function/invocations" \
-        -d '{"video_url": "https://sign-recognizer.s3.amazonaws.com/new-videos/05743.mp4"}'
+	curl -i -XPOST \
+	"http://localhost:9001/2015-03-31/functions/function/invocations" \
+	-d '{"video_url": "https://sign-recognizer.s3.amazonaws.com/new-videos/05743.mp4"}'
 
 ######################
 # AWS ECR commands
