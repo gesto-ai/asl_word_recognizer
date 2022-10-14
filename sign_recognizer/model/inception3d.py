@@ -11,10 +11,6 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 
 
-def default_activation(x: torch.Tensor) -> torch.Tensor:
-    return x
-
-
 class MaxPool3dSamePadding(nn.Module):
     def __init__(
         self, kernel_size: Tuple[int], stride: Tuple[int], padding: int = 0
@@ -77,7 +73,6 @@ class Unit3D(nn.Module):
         self._kernel_shape = kernel_shape
         self._stride = stride
         self._use_batch_norm = use_batch_norm
-        # self._activation_fn = activation_fn
         self._use_bias = use_bias
         self.name = name
         self.padding = padding
