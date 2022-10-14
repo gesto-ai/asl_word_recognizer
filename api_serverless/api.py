@@ -24,7 +24,7 @@ def _load_video(event):
     video_url = event.get("video_url")
     if video_url is not None:
         print("INFO url {}".format(video_url))
-        return process_video(video_url, 1, 74)
+        return process_video(video_url)
     return None
 
 

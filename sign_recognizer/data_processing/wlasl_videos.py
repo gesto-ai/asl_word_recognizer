@@ -28,6 +28,7 @@ def load_rgb_frames_from_video_dataset(video_path: Union[str, Path], start_frame
     if num_frames == -1:
         num_frames = int(vidcap.get(cv2.CAP_PROP_FRAME_COUNT))
 
+    print(f"INFO Number of frames on video: {num_frames}")
     vidcap.set(cv2.CAP_PROP_POS_FRAMES, start_frame)
     for _ in range(num_frames):
         _, img = vidcap.read()
