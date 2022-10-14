@@ -20,10 +20,10 @@ scp -r team_046@150.136.219.226:/home/team_046/models ./
 ```
 
 
-### Step 2: run `sign_recognizer.py`
+### Step 2: run `sign_recognizer.py` (currently not working)
 
 ```
-python sign_recognizer.py /path/to/video.mp4
+python sign_recognizer/word_sign_recognizer.py /path/to/video.mp4
 ```
 
 You can download a sample video file from [here](https://discord.com/channels/@me/1017414703133237298/1024513846427262976).
