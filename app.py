@@ -23,11 +23,12 @@ uploaded_video = st.file_uploader("Upload a video...")
 
 if uploaded_video is not None:
     # We'll need this path for opening the video with OpenCV
-    video_filepath = uploaded_video.name
+    
+    video_filepath = f"sign-recognizer/new-videos/{uploaded_video.name}"        
     print(f"Video filepath: {video_filepath}")
 
     # Save video to disk
-    with fs.open(f"sign-recognizer/new-videos/{video_filepath}", mode='wb') as f:
+    with fs.open(video_filepath, mode='wb') as f:
         f.write(uploaded_video.read()) 
 
     # Open video from disk path - technically not needed because we can feed the bytes-like object to st.video
