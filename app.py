@@ -32,7 +32,7 @@ if uploaded_video is not None:
 
     # Open video from disk path - technically not needed because we can feed the bytes-like object to st.video
     st.video(full_s3_video_url)
-    st.write("Uploaded video and stored to disk!")
+    st.write("Uploaded video and stored to S3!")
 
     if AWS_LAMBDA_URL is None:
         st.write("AWS Lambda URL not found. Initializing model with local code...")
