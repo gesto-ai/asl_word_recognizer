@@ -1,6 +1,7 @@
 # %%
-from model.inception3d import *
+from sign_recognizer.model.inception3d import *
 import torch.nn as nn
+import torch
 
 # %%
 sm = torch.jit.script(
@@ -70,19 +71,22 @@ print(sm)
 sm = torch.jit.script(InceptionI3d(400, in_channels=3))
 print("Inception I3D compiled", sm)
 # %%
-sm.save("inception_i3d.pt")
+sm.save("artifacts/sign-recognizer/model.pt")
 print("Model saved successfully")
 
 # %%
-mdl = torch.jit.load("inception_i3d.pt")
+mdl = torch.jit.load("artifacts/sign-recognizer/inception_i3d.pt")
 print("Model reloaded successfully", mdl)
 
+# %%
 # %%
 # We'll use the weights from the general pre-trained inception model, then the weights for the fine tuned one on ASL
 # Download these from https://github.com/dxli94/WLASL#training-and-testing
 LABEL_MAPPING_PATH = "./data_processing/wlasl_class_list.txt"
-ID3_PRETRAINED_WEIGHTS_PATH = "./models/WLASL/weights/rgb_imagenet.pt"
-WLASL_PRETRAINED_WEIGHTS_PATH = "./models/WLASL/archived/asl100/FINAL_nslt_100_iters=896_top1=65.89_top5=84.11_top10=89.92.pt"
+ID3_PRETRAINED_WEIGHTS_PATH = (
+    "./sign_recognizer/artifacts/models/WLASL/weights/rgb_imagenet.pt"
+)
+WLASL_PRETRAINED_WEIGHTS_PATH = "./sign_recognizer/artifacts/models/WLASL/archived/asl100/FINAL_nslt_100_iters=896_top1=65.89_top5=84.11_top10=89.92.pt"
 NUM_CLASSES = 100
 
 
@@ -95,21 +99,23 @@ def load_inception_model(device=0):
     """
 
     # Initialize model
-    pretrained_i3d_model = torch.jit.script(InceptionI3d(100, in_channels=3))
+    pretrained_i3d_model = InceptionI3d(400, in_channels=3)
 
-    # # Load the general inception model weights
-    # pretrained_i3d_model.load_state_dict(
-    #     torch.load(ID3_PRETRAINED_WEIGHTS_PATH), strict=False
-    # )
+    # Load the general inception model weights
+    pretrained_i3d_model.load_state_dict(
+        torch.load(ID3_PRETRAINED_WEIGHTS_PATH), strict=False
+    )
 
     # Adapt the final layer for the number of classes we expect
-    # pretrained_i3d_model.replace_logits(NUM_CLASSES)
+    pretrained_i3d_model.replace_logits(NUM_CLASSES)
 
     # Load the weights for the fine-tuned model on ASL
     pretrained_i3d_model.load_state_dict(
         torch.load(WLASL_PRETRAINED_WEIGHTS_PATH, map_location=torch.device("cpu")),
         strict=False,
     )
+
+    pretrained_i3d_model = torch.jit.script(pretrained_i3d_model)
 
     # Move to GPU
     # i3d.cuda(device=device)
