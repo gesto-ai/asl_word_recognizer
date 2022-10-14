@@ -2,16 +2,16 @@
 
 # NOTE: Asume .env contains
 # AWS_ACCOUNT_ID=123456789
-# AWS_REGION=some-valid-aws-region
+# AWS_DEFAULT_REGION=some-valid-aws-region
 # AWS_ACCESS_KEY=AKBCDEFGHIJKL
 # AWS_SECRET_ACCESS_KEY=qwertyuiopasdfghjklzxcvbnm
 
-include .env
+# include .env
 
 LAMBDA_AND_CONTAINER_NAME = sign-recognizer
 LAMBDA_ROLE_NAME = sign-recognizer-role
 
-ECR_URI = $(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_REGION).amazonaws.com
+ECR_URI = $(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_DEFAULT_REGION).amazonaws.com
 IMAGE_URI = $(ECR_URI)/$(LAMBDA_AND_CONTAINER_NAME)
 AWS_DOCKERFILE_NAME = api_serverless/Dockerfile
 
@@ -50,7 +50,7 @@ test_wrong_before_sign:
 # AWS ECR commands
 ######################
 authenticate_ecr:
-	aws ecr get-login-password --region $(AWS_REGION) | docker login --username AWS --password-stdin $(ECR_URI)
+	aws ecr get-login-password --region $(AWS_DEFAULT_REGION) | docker login --username AWS --password-stdin $(ECR_URI)
 
 create_ecr_repository: authenticate_ecr
 	aws ecr create-repository --repository-name $(LAMBDA_AND_CONTAINER_NAME) --image-scanning-configuration scanOnPush=true --image-tag-mutability MUTABLE
@@ -89,7 +89,7 @@ create_lambda_function:
 		$(shell sleep 10)
 		aws lambda create-function \
 		--function-name $(LAMBDA_AND_CONTAINER_NAME) \
-		--region $(AWS_REGION) \
+		--region $(AWS_DEFAULT_REGION) \
 		--package-type Image \
 		--code ImageUri=$(IMAGE_URI):latest \
 		--role $(shell aws iam get-role --role-name $(LAMBDA_ROLE_NAME) --output json | jq -r '.Role.Arn')
@@ -98,7 +98,7 @@ create_lambda_function:
 	$(shell sleep 5)
 	aws lambda update-function-configuration \
 	--function-name $(LAMBDA_AND_CONTAINER_NAME) \
-	--region $(AWS_REGION) \
+	--region $(AWS_DEFAULT_REGION) \
 	--timeout 60 \
 	--memory-size 10240
 
