@@ -2,6 +2,7 @@ import streamlit as st
 from predictor_backend import PredictorBackend
 import s3fs
 import os
+import pandas as pd
 
 fs = s3fs.S3FileSystem(anon=False)
 AWS_LAMBDA_URL = os.getenv("AWS_LAMBDA_URL")
@@ -13,6 +14,9 @@ DEMO_VIDEO_LABEL = "before"
 # S3 constants
 S3_BUCKET_NAME = "sign-recognizer"
 S3_UPLOADED_VIDEOS_FOLDER = "new-videos"
+
+# New videos CSV file
+NEW_VIDEOS_CSV_FILEPATH = "new_videos.csv"
 
 st.header("Welcome to Gesto AI")
 st.write("Upload any video of a sign or enter a public video URL and get a predicted word as text! The demo video for this app is [05727.mp4](https://sign-recognizer.s3.amazonaws.com/new-videos/05727.mp4) (prediction = 'before') from the WLASL dataset.")
@@ -69,5 +73,12 @@ if video_url is not None:
         st.write("Please tell us what the correct word was. Check back soon for an updated model that learns from your feedback!")
         correct_label = st.text_input("Enter word here", "")
         st.write(f"The correct label you entered: '{correct_label}'. Thanks for your input!")
+        
+        df = pd.read_csv(NEW_VIDEOS_CSV_FILEPATH)
+        print(df.columns)
+        if video_url not in df["video_s3_url"]:
+            df = df.append({"video_s3_url": video_url, "predicted_label": prediction, "correct_label": correct_label}, ignore_index=True)
+            df.to_csv(NEW_VIDEOS_CSV_FILEPATH)
+
 
     
