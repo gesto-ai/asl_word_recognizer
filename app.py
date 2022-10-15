@@ -1,43 +1,73 @@
 import streamlit as st
+from predictor_backend import PredictorBackend
+import s3fs
+import os
 
-from sign_recognizer.word_sign_recognizer import ASLWordRecognizer
+fs = s3fs.S3FileSystem(anon=False)
+AWS_LAMBDA_URL = os.getenv("AWS_LAMBDA_URL")
+
+# Demo constants
+DEMO_VIDEO_URL = "https://sign-recognizer.s3.amazonaws.com/new-videos/05727.mp4"
+DEMO_VIDEO_LABEL = "before"
+
+# S3 constants
+S3_BUCKET_NAME = "sign-recognizer"
+S3_UPLOADED_VIDEOS_FOLDER = "new-videos"
 
 st.header("Welcome to Gesto AI")
-st.write("Upload any video of a sign and get a predicted word as text! The demo video for this app is 05727.mp4 from the WLASL dataset.")
+st.write("Upload any video of a sign or enter a public video URL and get a predicted word as text! The demo video for this app is [05727.mp4](https://sign-recognizer.s3.amazonaws.com/new-videos/05727.mp4) (prediction = 'before') from the WLASL dataset.")
 
-uploaded_video = st.file_uploader("Upload a video...")
+input_video_url = st.text_input('Please enter a public URL pointing directly to a video:')
+if st.button('Click here for sample video URLs'):
+    st.code("https://sign-recognizer.s3.amazonaws.com/new-videos/05742.mp4", language="html")
+    st.code("https://sign-recognizer.s3.amazonaws.com/new-videos/05740.mp4", language="html")
+    st.code("https://sign-recognizer.s3.amazonaws.com/new-videos/05732.mp4", language="html")
+
+video_url = None
+
+# Option 1: Video file upload
+uploaded_video = st.file_uploader("Or upload an .mp4 video file:")
 
 if uploaded_video is not None:
-    pretrained_model = ASLWordRecognizer()
-
     # We'll need this path for opening the video with OpenCV
-    video_filepath = uploaded_video.name
-    print(f"Video filepath: {video_filepath}")
+    short_s3_video_url = f"{S3_BUCKET_NAME}/{S3_UPLOADED_VIDEOS_FOLDER}/{uploaded_video.name}"    
+    video_url = f"https://{S3_BUCKET_NAME}.s3.amazonaws.com/{S3_UPLOADED_VIDEOS_FOLDER}/{uploaded_video.name}"
+    print(f"Video S3 URL: {video_url}")
 
-    # Save video to disk
-    with open(video_filepath, mode='wb') as f:
+    # Save video to our S3 bucket
+    with fs.open(short_s3_video_url, mode='wb') as f:
         f.write(uploaded_video.read()) 
 
     # Open video from disk path - technically not needed because we can feed the bytes-like object to st.video
-    st_video = open(video_filepath, 'rb')
-    video_bytes = st_video.read()
-    st.video(video_bytes)
-    st.write("Uploaded video and stored to disk! Getting predictions...")
+    st.write(f"Uploaded video to AWS S3!")
 
-    # Temporarily hard coded for the video we're uploading/testing
-    label = 3
+# Option 2: Video URL 
+elif input_video_url:
+    print(f"Public URL for video: {input_video_url}")
+    video_url = input_video_url
 
-    res = pretrained_model.predict(video_filepath)
-    st.write(f"Final prediction: {res}")
-    st.write(f"Expected label: {pretrained_model.mapping[label]}")
-    
-    
+if video_url is not None:
+    st.video(video_url)
+    st.write("Loading model...")
+    if AWS_LAMBDA_URL is None:
+        print("AWS Lambda URL not found. Initializing model with local code...")
+        model = PredictorBackend()
+    else:
+        print("AWS Lambda URL found! Initializing model with predictor backend...")
+        model = PredictorBackend(url=AWS_LAMBDA_URL)
+    st.write("Getting prediction...")
+    prediction = model.run(video_url)
+    st.write(f"Prediction: {prediction}")
+
+    # Print the expected label for the demo video
+    if video_url == DEMO_VIDEO_URL:
+        st.write(f"Expected label for demo: {DEMO_VIDEO_LABEL}")
+
     correctness_state = st.selectbox('Would you like to submit feedback?',
-                ('Predicted word is correct!', 'Predicted word is incorrect.'))    
-    if correctness_state == 'Predicted word is incorrect.':
-        st.write("Please tell us what the correct word was. Check back soon for an updated model that learns from your feedback")
-        correct_label = st.text_input('Enter word here', "Hello")
-        st.write('The current correct_label', correct_label)
-
+                ('Predicted word is correct :)', 'Predicted word is incorrect :('))    
+    if correctness_state == 'Predicted word is incorrect :(':
+        st.write("Please tell us what the correct word was. Check back soon for an updated model that learns from your feedback!")
+        correct_label = st.text_input("Enter word here", "")
+        st.write(f"The correct label you entered: '{correct_label}'. Thanks for your input!")
 
     

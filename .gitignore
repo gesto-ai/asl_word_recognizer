@@ -10,6 +10,9 @@ __pycache__
 # Misc
 .aws/credentials
 .DS_Store
+.env
+*.out
+.streamlit
 
 # logging
 *.pt
@@ -17,3 +20,4 @@ __pycache__
 
 # artifacts
 artifacts/
+*.mp4
