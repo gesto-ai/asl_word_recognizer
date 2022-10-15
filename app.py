@@ -82,7 +82,11 @@ def out_recorder_factory() -> MediaRecorder:
 
 def stop_button():
     print("user webcam recording stopped!")
-    
+    video_file = open('user_recording.mp4', 'rb')
+    video_bytes = video_file.read()
+
+    st.video(video_bytes)
+
 
 webrtc_streamer(
     key="loopback",
