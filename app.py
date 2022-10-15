@@ -18,13 +18,16 @@ S3_UPLOADED_VIDEOS_FOLDER = "new-videos"
 st.header("Welcome to Gesto AI")
 st.write("Upload any video of a sign or enter a public video URL and get a predicted word as text! The demo video for this app is [05727.mp4](https://sign-recognizer.s3.amazonaws.com/new-videos/05727.mp4) (prediction = 'before') from the WLASL dataset.")
 
-input_video_url = st.text_input('Please enter a public video URL')
+input_video_url = st.text_input('Please enter a public URL pointing directly to a video:')
+if st.button('Click here for sample video URLs'):
+    st.code("https://sign-recognizer.s3.amazonaws.com/new-videos/05742.mp4", language="html")
+    st.code("https://sign-recognizer.s3.amazonaws.com/new-videos/05740.mp4", language="html")
+    st.code("https://sign-recognizer.s3.amazonaws.com/new-videos/05732.mp4", language="html")
+
 video_url = None
 
 # Option 1: Video file upload
-uploaded_video = st.file_uploader("Or upload an .mp4 video file")
-
-
+uploaded_video = st.file_uploader("Or upload an .mp4 video file:")
 
 if uploaded_video is not None:
     # We'll need this path for opening the video with OpenCV
@@ -46,23 +49,19 @@ elif input_video_url:
 
 if video_url is not None:
     st.video(video_url)
+    st.write("Loading model...")
     if AWS_LAMBDA_URL is None:
-        st.write("AWS Lambda URL not found. Initializing model with local code...")
+        print("AWS Lambda URL not found. Initializing model with local code...")
         model = PredictorBackend()
     else:
-        st.write("AWS Lambda URL found! Initializing model with predictor backend...")
+        print("AWS Lambda URL found! Initializing model with predictor backend...")
         model = PredictorBackend(url=AWS_LAMBDA_URL)
     st.write("Getting prediction...")
     prediction = model.run(video_url)
-    st.write(f"Final prediction: {prediction}")
+    st.write(f"Prediction: {prediction}")
 
     # Print the expected label for the demo video
     if video_url == DEMO_VIDEO_URL:
         st.write(f"Expected label for demo: {DEMO_VIDEO_LABEL}")
 
-st.write("Sample URLs:")
-st.code("https://sign-recognizer.s3.amazonaws.com/new-videos/05742.mp4", language="html")
-st.code("https://sign-recognizer.s3.amazonaws.com/new-videos/05740.mp4", language="html")
-st.code("https://sign-recognizer.s3.amazonaws.com/new-videos/05732.mp4", language="html")
-#st.code("https://sign-recognizer.s3.amazonaws.com/new-videos/05731.mp4", language="html")
     
