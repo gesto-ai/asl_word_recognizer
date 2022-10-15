@@ -1,5 +1,4 @@
 import streamlit as st
-from dotenv import dotenv_values
 from predictor_backend import PredictorBackend
 import s3fs
 import os
@@ -63,5 +62,12 @@ if video_url is not None:
     # Print the expected label for the demo video
     if video_url == DEMO_VIDEO_URL:
         st.write(f"Expected label for demo: {DEMO_VIDEO_LABEL}")
+
+    correctness_state = st.selectbox('Would you like to submit feedback?',
+                ('Predicted word is correct :)', 'Predicted word is incorrect :('))    
+    if correctness_state == 'Predicted word is incorrect :(':
+        st.write("Please tell us what the correct word was. Check back soon for an updated model that learns from your feedback!")
+        correct_label = st.text_input("Enter word here", "")
+        st.write(f"The correct label you entered: '{correct_label}'. Thanks for your input!")
 
     
