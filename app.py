@@ -61,6 +61,8 @@ if video_url is not None:
         st.write(f"Expected label for demo: {DEMO_VIDEO_LABEL}")
 
 st.write("Sample URLs:")
+st.code("https://sign-recognizer.s3.amazonaws.com/new-videos/05742.mp4", language="html")
+st.code("https://sign-recognizer.s3.amazonaws.com/new-videos/05740.mp4", language="html")
 st.code("https://sign-recognizer.s3.amazonaws.com/new-videos/05732.mp4", language="html")
-st.code("https://sign-recognizer.s3.amazonaws.com/new-videos/05731.mp4", language="html")
+#st.code("https://sign-recognizer.s3.amazonaws.com/new-videos/05731.mp4", language="html")
     
