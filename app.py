@@ -78,8 +78,11 @@ class VideoProcessor(VideoProcessorBase):
         return av.VideoFrame.from_ndarray(flipped, format="bgr24")
 
 def out_recorder_factory() -> MediaRecorder:
-    print("recording stopped!")
     return MediaRecorder("user_recording.mp4", format="mp4")
+
+def stop_button():
+    print("user webcam recording stopped!")
+    
 
 webrtc_streamer(
     key="loopback",
@@ -91,4 +94,5 @@ webrtc_streamer(
     },
     video_processor_factory=VideoProcessor,
     out_recorder_factory=out_recorder_factory,
+    on_video_ended=stop_button
 )
