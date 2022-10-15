@@ -40,7 +40,7 @@ if uploaded_video is not None:
         f.write(uploaded_video.read()) 
 
     # Open video from disk path - technically not needed because we can feed the bytes-like object to st.video
-    st.write(f"Uploaded video and stored to S3! URL: [{video_url}]({video_url})")
+    st.write(f"Uploaded video to AWS S3! URL")
 
 # Option 2: Video URL 
 elif input_video_url:
