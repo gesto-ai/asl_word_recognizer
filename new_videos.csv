@@ -1,5 +1,0 @@
-,Unnamed: 0.1,Unnamed: 0,video_s3_url,predicted_label,correct_label
-0,0.0,0.0,https://sign-recognizer.s3.amazonaws.com/new-videos/05742.mp4,before,boobs
-1,1.0,1.0,https://sign-recognizer.s3.amazonaws.com/new-videos/05742.mp4,before,boobs
-2,2.0,,https://sign-recognizer.s3.amazonaws.com/new-videos/05732.mp4,many,
-3,,,https://sign-recognizer.s3.amazonaws.com/new-videos/05732.mp4,many,lmap

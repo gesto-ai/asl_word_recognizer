@@ -15,8 +15,14 @@ DEMO_VIDEO_LABEL = "before"
 S3_BUCKET_NAME = "sign-recognizer"
 S3_UPLOADED_VIDEOS_FOLDER = "new-videos"
 
-# New videos CSV file
-NEW_VIDEOS_CSV_FILEPATH = "new_videos.csv"
+# New videos uploaded by user - CSV file URL
+NEW_VIDEOS_CSV_FILENAME = os.getenv("USER_FEEDBACK_CSV_S3_FILENAME")
+
+# Retrieve file contents from AWS S3 - useful for feedback gathering
+# Uses st.experimental_memo to only rerun when the query changes or after 10 min.
+@st.experimental_memo(ttl=600)
+def read_csv(s3_path):
+    return pd.read_csv(s3_path)
 
 st.header("Welcome to Gesto AI")
 st.write("Upload any video of a sign or enter a public video URL and get a predicted word as text! The demo video for this app is [05727.mp4](https://sign-recognizer.s3.amazonaws.com/new-videos/05727.mp4) (prediction = 'before') from the WLASL dataset.")
@@ -30,16 +36,16 @@ if st.button('Click here for sample video URLs'):
 video_url = None
 
 # Option 1: Video file upload
-uploaded_video = st.file_uploader("Or upload an .mp4 video file:")
+uploaded_video = st.file_uploader("Or upload an .mp4 video file (NOTE: This will automatically upload the video to our S3 bucket and generate a URL for it):")
 
 if uploaded_video is not None:
     # We'll need this path for opening the video with OpenCV
-    short_s3_video_url = f"{S3_BUCKET_NAME}/{S3_UPLOADED_VIDEOS_FOLDER}/{uploaded_video.name}"    
+    video_s3_path = f"{S3_BUCKET_NAME}/{S3_UPLOADED_VIDEOS_FOLDER}/{uploaded_video.name}"    
     video_url = f"https://{S3_BUCKET_NAME}.s3.amazonaws.com/{S3_UPLOADED_VIDEOS_FOLDER}/{uploaded_video.name}"
     print(f"Video S3 URL: {video_url}")
 
     # Save video to our S3 bucket
-    with fs.open(short_s3_video_url, mode='wb') as f:
+    with fs.open(video_s3_path, mode='wb') as f:
         f.write(uploaded_video.read()) 
     st.write(f"Uploaded video to AWS S3!")
 
@@ -73,11 +79,12 @@ if video_url is not None:
         st.write(f"The correct label you entered: '{correct_label}'. Thanks for your input!")
         
         # Add the feedback to a CSV file only if we haven't added feedback to that video URL already
-        df = pd.read_csv(NEW_VIDEOS_CSV_FILEPATH)
-        if video_url not in df["video_s3_url"].values and correct_label:
+        new_videos_csv_s3_path = f"s3://{S3_BUCKET_NAME}/{NEW_VIDEOS_CSV_FILENAME}"
+        df = read_csv(new_videos_csv_s3_path)
+        if df is not None and video_url not in df["video_s3_url"].values and correct_label:
             new_row = pd.Series({"video_s3_url": video_url, "predicted_label": prediction, "correct_label": correct_label})
             df = pd.concat([df, new_row.to_frame().T], ignore_index=True)
-            df.to_csv(NEW_VIDEOS_CSV_FILEPATH, index=False)
+            df.to_csv(new_videos_csv_s3_path, index=False)
 
 
     
