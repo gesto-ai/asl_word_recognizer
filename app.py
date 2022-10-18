@@ -1,13 +1,13 @@
-from curses import BUTTON1_CLICKED
-import streamlit as st
-from predictor_backend import PredictorBackend
-from sign_recognizer.data_processing.wlasl_videos import load_rgb_frames_from_video_dataset
-import s3fs
-import boto3
 import os
 import sys
-import pandas as pd
 from urllib.request import urlretrieve
+
+import boto3
+import pandas as pd
+import s3fs
+import streamlit as st
+
+from predictor_backend import PredictorBackend
 
 ########################################################
 # Defining all constants, helpers and setup
