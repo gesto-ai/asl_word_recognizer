@@ -41,8 +41,6 @@ if uploaded_video is not None:
     # Save video to our S3 bucket
     with fs.open(short_s3_video_url, mode='wb') as f:
         f.write(uploaded_video.read()) 
-
-    # Open video from disk path - technically not needed because we can feed the bytes-like object to st.video
     st.write(f"Uploaded video to AWS S3!")
 
 # Option 2: Video URL 
@@ -74,11 +72,12 @@ if video_url is not None:
         correct_label = st.text_input("Enter word here", "")
         st.write(f"The correct label you entered: '{correct_label}'. Thanks for your input!")
         
+        # Add the feedback to a CSV file only if we haven't added feedback to that video URL already
         df = pd.read_csv(NEW_VIDEOS_CSV_FILEPATH)
-        print(df.columns)
-        if video_url not in df["video_s3_url"]:
-            df = df.append({"video_s3_url": video_url, "predicted_label": prediction, "correct_label": correct_label}, ignore_index=True)
-            df.to_csv(NEW_VIDEOS_CSV_FILEPATH)
+        if video_url not in df["video_s3_url"].values and correct_label:
+            new_row = pd.Series({"video_s3_url": video_url, "predicted_label": prediction, "correct_label": correct_label})
+            df = pd.concat([df, new_row.to_frame().T], ignore_index=True)
+            df.to_csv(NEW_VIDEOS_CSV_FILEPATH, index=False)
 
 
     
