@@ -78,6 +78,7 @@ if uploaded_video is not None:
 
     # We need to generate a presigned S3 URL S3 for OpenCV to access the video
     video_url = S3_CLIENT.generate_presigned_url(ClientMethod='get_object', Params={"Bucket": S3_BUCKET_NAME, "Key": f"{S3_UPLOADED_VIDEOS_FOLDER}/{uploaded_video.name}"})
+    video_s3_url = f"https://{S3_BUCKET_NAME}.s3.amazonaws.com/{S3_UPLOADED_VIDEOS_FOLDER}/{uploaded_video.name}"
     print(f"Presigned URL for input video: {video_url}")
 
 ##############################
@@ -108,6 +109,7 @@ elif input_video_url:
                 f.write(input_videofile.read()) 
             st.write(f"Uploaded video to AWS S3!")
         video_url = S3_CLIENT.generate_presigned_url(ClientMethod='get_object', Params={"Bucket": S3_BUCKET_NAME, "Key": f"{S3_UPLOADED_VIDEOS_FOLDER}/{encoded_video_name}.mp4"})
+        video_s3_url = f"https://{S3_BUCKET_NAME}.s3.amazonaws.com/{S3_UPLOADED_VIDEOS_FOLDER}/{encoded_video_name}.mp4"
         print(f"Presigned URL for input video URL: {video_url}")
 
 if video_url is not None:
@@ -149,9 +151,9 @@ if video_url is not None:
         # Add the feedback to a CSV file only if we haven't added feedback to that video URL already
         new_videos_csv_s3_path = f"s3://{S3_BUCKET_NAME}/{NEW_VIDEOS_CSV_FILENAME}"
         df = read_csv(new_videos_csv_s3_path)
-        if df is not None and video_url not in df["video_s3_url"].values and correct_label:
+        if df is not None and video_s3_url not in df["video_s3_url"].values and correct_label:
             print("Adding user feedback to CSV and uploading to S3...")
-            new_row = pd.Series({"video_s3_url": video_url, "predicted_label": prediction, "correct_label": correct_label})
+            new_row = pd.Series({"video_s3_url": video_s3_url, "predicted_label": prediction, "correct_label": correct_label})
             df = pd.concat([df, new_row.to_frame().T], ignore_index=True)
             df.to_csv(new_videos_csv_s3_path, index=False)
 
