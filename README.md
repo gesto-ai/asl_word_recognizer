@@ -43,7 +43,7 @@ streamlit run app.py
 ```
 
 ## [INTERNAL] Building and testing the backend prediction server
-We can test the prediction server logic without deploying to AWS.
+We can test the prediction server logic without deploying to AWS. **NOTE:** If you run this in your local machine, it will probably timeout - so make sure to run it in a GPU-powered machine!
 
 0. First, comment out the line `include .env` in the Makefile, unless you have a `.env` file with the expected information.
 1. Build the docker image
@@ -57,7 +57,6 @@ make run
 ```
 3. In a different terminal session, run a local test with the demo video by sending a POST request to the running container.
 
-**NOTE:** If you run this in your local machine, it will probably timeout - so make sure to run it in a GPU-powered machine!
 ```
 make test_local
 ```
