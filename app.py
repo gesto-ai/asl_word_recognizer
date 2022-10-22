@@ -137,13 +137,15 @@ if video_url is not None:
         if correctness_state == INCORRECT_PREDICTION_DROPDOWN_TEXT:
             st.write("Please tell us what the correct word was:")
             correct_label = st.text_input("Enter word here", "")
-            st.write(f"The correct label you entered: '{correct_label}'. Thanks for your input!")
             
         elif correctness_state == CORRECT_PREDICTION_DROPDOWN_TEXT:
             st.write("Thanks for your input! We're always trying to improve our models from user feedback.")
             correct_label = prediction
 
         if correct_label:
+            if correctness_state == INCORRECT_PREDICTION_DROPDOWN_TEXT:
+                st.write(f"The correct label you entered: '{correct_label}'. Thanks for your input!")
+
             # Add the feedback to a CSV file only if we haven't added feedback to that video URL already
             new_videos_csv_s3_path = f"s3://{S3_BUCKET_NAME}/{NEW_VIDEOS_CSV_FILENAME}"
             df = pd.read_csv(new_videos_csv_s3_path)
