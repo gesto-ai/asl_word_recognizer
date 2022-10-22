@@ -140,22 +140,28 @@ if video_url is not None:
     if correctness_state in {CORRECT_PREDICTION_DROPDOWN_TEXT, INCORRECT_PREDICTION_DROPDOWN_TEXT}:
         print("Starting feedback collection process...")
         if correctness_state == INCORRECT_PREDICTION_DROPDOWN_TEXT:
-            st.write("Please tell us what the correct word was. Check back soon for an updated model that learns from your feedback!")
+            st.write("Please tell us what the correct word was:")
             correct_label = st.text_input("Enter word here", "")
             st.write(f"The correct label you entered: '{correct_label}'. Thanks for your input!")
             
         elif correctness_state == CORRECT_PREDICTION_DROPDOWN_TEXT:
-            st.write("Thank you! We're always trying to improve our models from user feedback.")
+            st.write("Thanks for your input! We're always trying to improve our models from user feedback.")
             correct_label = prediction
 
-        # Add the feedback to a CSV file only if we haven't added feedback to that video URL already
-        new_videos_csv_s3_path = f"s3://{S3_BUCKET_NAME}/{NEW_VIDEOS_CSV_FILENAME}"
-        df = read_csv(new_videos_csv_s3_path)
-        if df is not None and video_s3_url not in df["video_s3_url"].values and correct_label:
-            print("Adding user feedback to CSV and uploading to S3...")
+        if correct_label:
+            # Add the feedback to a CSV file only if we haven't added feedback to that video URL already
+            new_videos_csv_s3_path = f"s3://{S3_BUCKET_NAME}/{NEW_VIDEOS_CSV_FILENAME}"
+            df = read_csv(new_videos_csv_s3_path)
+            print(f"Loaded user feedback CSV file. Current number of rows: {len(df)}")
+            if df is None:
+                st.write("Internal Error: User feedback CSV file not found!")
+                raise FileNotFoundError("Internal Error: User feedback CSV file not found!")
+            
             new_row = pd.Series({"video_s3_url": video_s3_url, "predicted_label": prediction, "correct_label": correct_label})
-            df = pd.concat([df, new_row.to_frame().T], ignore_index=True)
-            df.to_csv(new_videos_csv_s3_path, index=False)
+            new_df = pd.concat([df, new_row.to_frame().T], ignore_index=True)
+            new_df.to_csv(new_videos_csv_s3_path, index=False)
+            print(f"Added user feedback to CSV and uploaded to S3! Number of rows after adding: {len(new_df)}")
+            st.write(f"-> Uploaded feedback to our internal files. Check back soon for an updated model!")
 
 
     
