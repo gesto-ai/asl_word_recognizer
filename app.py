@@ -1,5 +1,6 @@
 import os
 import sys
+from datetime import datetime
 from urllib.request import urlretrieve
 
 import boto3
@@ -34,12 +35,6 @@ except Exception as e:
 
 # New videos uploaded by user - CSV file URL
 NEW_VIDEOS_CSV_FILENAME = os.getenv("USER_FEEDBACK_CSV_S3_FILENAME")
-
-# Retrieve file contents from AWS S3 - useful for feedback gathering
-# Uses st.experimental_memo to only rerun when the query changes or after 10 min.
-@st.experimental_memo(ttl=600)
-def read_csv(s3_path):
-    return pd.read_csv(s3_path)
 
 # Default messsages to display when asking for user feedback
 CORRECT_PREDICTION_DROPDOWN_TEXT = "Predicted word is correct :)"
@@ -151,17 +146,16 @@ if video_url is not None:
         if correct_label:
             # Add the feedback to a CSV file only if we haven't added feedback to that video URL already
             new_videos_csv_s3_path = f"s3://{S3_BUCKET_NAME}/{NEW_VIDEOS_CSV_FILENAME}"
-            df = read_csv(new_videos_csv_s3_path)
+            df = pd.read_csv(new_videos_csv_s3_path)
             print(f"Loaded user feedback CSV file. Current number of rows: {len(df)}")
             if df is None:
-                st.write("Internal Error: User feedback CSV file not found!")
                 raise FileNotFoundError("Internal Error: User feedback CSV file not found!")
             
-            new_row = pd.Series({"video_s3_url": video_s3_url, "predicted_label": prediction, "correct_label": correct_label})
+            new_row = pd.Series({"video_s3_url": video_s3_url, "predicted_label": prediction, "correct_label": correct_label, "date_added": datetime.utcnow().strftime("%Y-%m-%d_%H:%M:%S")})
             new_df = pd.concat([df, new_row.to_frame().T], ignore_index=True)
             new_df.to_csv(new_videos_csv_s3_path, index=False)
-            print(f"Added user feedback to CSV and uploaded to S3! Number of rows after adding: {len(new_df)}")
-            st.write(f"-> Uploaded feedback to our internal files. Check back soon for an updated model!")
+            print(f"Added feedback row to CSV and uploaded to S3! Number of rows after adding: {len(new_df)}. New row: \n{new_row}")
+            st.write(f"Uploaded feedback to our internal files. Check back soon for an updated model!")
 
 
     
