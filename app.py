@@ -118,52 +118,52 @@ elif input_video_url:
 # Option 3: Webcam video
 ##############################
 
-if st.button('Click here if you want to use your webcam!'):
-    # st.write("Or use your webcam:")
-    DEFAULT_USER_VIDEO_FILENAME = "user_recording.mp4"
+# if st.button('Click here if you want to use your webcam!'):
+st.write("Or use your webcam:")
+DEFAULT_USER_VIDEO_FILENAME = "user_recording.mp4"
 
-    class VideoProcessor(VideoProcessorBase):
-        def recv(self, frame: av.VideoFrame) -> av.VideoFrame:
-            img = frame.to_ndarray(format="bgr24")
-            flipped = img[:,::-1,:] 
+class VideoProcessor(VideoProcessorBase):
+    def recv(self, frame: av.VideoFrame) -> av.VideoFrame:
+        img = frame.to_ndarray(format="bgr24")
+        flipped = img[:,::-1,:] 
 
-            return av.VideoFrame.from_ndarray(flipped, format="bgr24")
+        return av.VideoFrame.from_ndarray(flipped, format="bgr24")
 
-    def out_recorder_factory() -> MediaRecorder:
-        return MediaRecorder(DEFAULT_USER_VIDEO_FILENAME, format="mp4")
+def out_recorder_factory() -> MediaRecorder:
+    return MediaRecorder(DEFAULT_USER_VIDEO_FILENAME, format="mp4")
 
-    def stop_button():
-        print("User webcam recording stopped!")
+def stop_button():
+    print("User webcam recording stopped!")
 
-    webrtc_streamer(
-        key="loopback",
-        mode=WebRtcMode.SENDRECV,
-        rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
-        media_stream_constraints={
-            "video": True,
-            "audio": False,
-        },
-        video_processor_factory=VideoProcessor,
-        out_recorder_factory=out_recorder_factory,
-        on_video_ended=stop_button
-    )
+webrtc_streamer(
+    key="loopback",
+    mode=WebRtcMode.SENDRECV,
+    rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
+    media_stream_constraints={
+        "video": True,
+        "audio": False,
+    },
+    video_processor_factory=VideoProcessor,
+    out_recorder_factory=out_recorder_factory,
+    on_video_ended=stop_button
+)
 
-    if os.path.exists(DEFAULT_USER_VIDEO_FILENAME):
-        # Path that we'll upload the video to in S3
-        st.write("Waiting until the video has finished processing...")
-        time.sleep(15)
-        st.write(os.stat(DEFAULT_USER_VIDEO_FILENAME))
-        user_video_name = f"user_recording_{random.randint(0, 69420)}"
-        video_s3_path = f"{S3_BUCKET_NAME}/{S3_UPLOADED_VIDEOS_FOLDER}/{user_video_name}.mp4"
-        with open(DEFAULT_USER_VIDEO_FILENAME, "rb") as input_videofile:
-            # Save video to our S3 bucket
-            with fs.open(video_s3_path, mode='wb') as f:
-                f.write(input_videofile.read()) 
-            st.write(f"Uploaded video to AWS S3!")
-        video_url = S3_CLIENT.generate_presigned_url(ClientMethod='get_object', Params={"Bucket": S3_BUCKET_NAME, "Key": f"{S3_UPLOADED_VIDEOS_FOLDER}/{user_video_name}.mp4"})
+if os.path.exists(DEFAULT_USER_VIDEO_FILENAME):
+    # Path that we'll upload the video to in S3
+    st.write("Waiting until the video has finished processing...")
+    time.sleep(15)
+    st.write(os.stat(DEFAULT_USER_VIDEO_FILENAME))
+    user_video_name = f"user_recording_{random.randint(0, 69420)}"
+    video_s3_path = f"{S3_BUCKET_NAME}/{S3_UPLOADED_VIDEOS_FOLDER}/{user_video_name}.mp4"
+    with open(DEFAULT_USER_VIDEO_FILENAME, "rb") as input_videofile:
+        # Save video to our S3 bucket
+        with fs.open(video_s3_path, mode='wb') as f:
+            f.write(input_videofile.read()) 
+        st.write(f"Uploaded video to AWS S3!")
+    video_url = S3_CLIENT.generate_presigned_url(ClientMethod='get_object', Params={"Bucket": S3_BUCKET_NAME, "Key": f"{S3_UPLOADED_VIDEOS_FOLDER}/{user_video_name}.mp4"})
 
-        os.remove(DEFAULT_USER_VIDEO_FILENAME)
-        
+    os.remove(DEFAULT_USER_VIDEO_FILENAME)
+
 if video_url is not None:
     ##########################
     # Model prediction logic
