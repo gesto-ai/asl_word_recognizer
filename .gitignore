@@ -20,6 +20,11 @@ __pycache__
 
 # artifacts
 artifacts/
+
+data/
+lightning_logs
+preprocess/
+weights/
 *.mp4
 
 /env

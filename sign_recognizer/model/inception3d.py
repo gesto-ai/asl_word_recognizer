@@ -247,13 +247,9 @@ class InceptionI3d(nn.Module):
             "Predictions",
         ]
 
-        if final_endpoint not in self.VALID_ENDPOINTS:
-            raise ValueError("Unknown final endpoint %s" % final_endpoint)
-
-        super(InceptionI3d, self).__init__()
+        super().__init__()
         self._num_classes = num_classes
-        self._spatial_squeeze = spatial_squeeze
-        self._final_endpoint = final_endpoint
+        self._spatial_squeeze = True
         self.logits = None
 
         if self._final_endpoint not in self.VALID_ENDPOINTS:
