@@ -151,7 +151,7 @@ if os.path.exists(DEFAULT_USER_VIDEO_FILENAME):
     # Path that we'll upload the video to in S3
     user_video_name = f"user_recording_{random.randint(0, 69420)}"
     video_s3_path = f"{S3_BUCKET_NAME}/{S3_UPLOADED_VIDEOS_FOLDER}/{user_video_name}.mp4"
-    with open(local_input_video_path, "rb") as input_videofile:
+    with open(DEFAULT_USER_VIDEO_FILENAME, "rb") as input_videofile:
         # Save video to our S3 bucket
         with fs.open(video_s3_path, mode='wb') as f:
             f.write(input_videofile.read()) 
