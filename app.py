@@ -135,18 +135,19 @@ def out_recorder_factory() -> MediaRecorder:
 def stop_button():
     print("User webcam recording stopped!")
 
-webrtc_streamer(
-    key="loopback",
-    mode=WebRtcMode.SENDRECV,
-    rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
-    media_stream_constraints={
-        "video": True,
-        "audio": False,
-    },
-    video_processor_factory=VideoProcessor,
-    out_recorder_factory=out_recorder_factory,
-    on_video_ended=stop_button
-)
+if not os.path.exists(DEFAULT_USER_VIDEO_FILENAME):
+    webrtc_streamer(
+        key="loopback",
+        mode=WebRtcMode.SENDRECV,
+        rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
+        media_stream_constraints={
+            "video": True,
+            "audio": False,
+        },
+        video_processor_factory=VideoProcessor,
+        out_recorder_factory=out_recorder_factory,
+        on_video_ended=stop_button
+    )
 
 if os.path.exists(DEFAULT_USER_VIDEO_FILENAME):
     # Path that we'll upload the video to in S3
