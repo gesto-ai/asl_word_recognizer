@@ -26,3 +26,5 @@ lightning_logs
 preprocess/
 weights/
 *.mp4
+
+/env

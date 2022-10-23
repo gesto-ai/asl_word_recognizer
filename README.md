@@ -1,4 +1,25 @@
-# Model Serve
+# ASL Word Recognizer App
+
+This repository contains the code to run a Streamlit app that takes in a video URL/file containing a person doing a sign, and it returns the predicted word/text for that sign. Currently this works at the word-level only. 
+
+**Demo:** [https://gesto-ai-model-serve-app-video-app-vs3664.streamlitapp.com/](https://gesto-ai-model-serve-app-video-app-vs3664.streamlitapp.com/)
+
+**Model:** [Inception I3D](https://github.com/deepmind/kinetics-i3d)
+
+**Dataset:** Word-Level American Sign Language ([WLASL homepage](https://dxli94.github.io/WLASL/))
+
+**System Diagram:**
+
+- Data is stored in AWS S3.
+- The model service is packaged and served on an AWS Lambda function.
+- The UI/frontend is hosted on Streamlit.
+- There's a user feedback collection feature that stores user predictions in a CSV file in AWS S3.
+
+![system diagram](media/system_diagram.png)
+
+For more information, take a look at our presentation [slides](https://docs.google.com/presentation/d/1CiP4QLu5_bdibrZnjJygrSOjV-iFaqD7irHi4fD6CJc/edit?usp=sharing).
+
+Built for the 2022 Full Stack Deep Learning (FSDL) class by Shivam Arora, Daniel Firebanks, Pablo Oberhauser, Dhruv Shah, Ibrahim Sherif, and Samuel Tang. 
 
 ## Pre-requisites
 
@@ -7,41 +28,24 @@
 
 In a virtual environment (this was tested in a `conda` environment), install the required packages from the `requirements.txt` file:
 ```
-pip install -r requirements/requirements-frontend.txt
+pip install -r requirements.txt
 ```
 
-## Using the Sign Recognizer script
+## Using the Sign Recognizer app
 
-### Step 1: Get the model weights from the Lambda Labs VM
+### Step 1: Get the model weights
 
-The script currently expects the model weights to be stored in `model_serve/artifacts/sign-recognizer`.
-
-```
-cd model_serve
-
-scp -r team_046@150.136.219.226:/home/team_046/models/artifacts .  
-```
+The script currently expects the model weights to be stored in `model_serve/artifacts/sign-recognizer/model.pt`. You can download the model weights from [here](https://drive.google.com/file/d/1KVGkt-A3mRBC4Nu3Vty7uhOqr87tydwB/view?usp=sharing)
 
 
-### [NOT WORKING] Step 2: run `word_sign_recognizer.py`
-
-```
-python sign_recognizer/word_sign_recognizer.py /path/to/video.mp4
-```
-
-You can download a sample video file from [here](https://discord.com/channels/@me/1017414703133237298/1024513846427262976).
-
-
-## Running the Streamlit app (connected to the Sign Recognizer)
-
-After you have gotten the model weights from Step 1 of running the sign recognizer script, run:
+### Step 2: Running the Streamlit app locally
 
 ```
 streamlit run app.py
 ```
 
-## Building and testing the backend prediction server
-We can test the prediction server logic without deploying to AWS.
+## [INTERNAL] Building and testing the backend prediction server
+We can test the prediction server logic without deploying to AWS. **NOTE:** If you run this in your local machine, it will probably timeout - so make sure to run it in a GPU-powered machine!
 
 0. First, comment out the line `include .env` in the Makefile, unless you have a `.env` file with the expected information.
 1. Build the docker image
@@ -55,7 +59,6 @@ make run
 ```
 3. In a different terminal session, run a local test with the demo video by sending a POST request to the running container.
 
-**NOTE:** If you run this in your local machine, it will probably timeout - so make sure to run it in a GPU-powered machine!
 ```
 make test_local
 ```
