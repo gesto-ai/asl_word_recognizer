@@ -135,7 +135,6 @@ def out_recorder_factory() -> MediaRecorder:
 def stop_button():
     print("User webcam recording stopped!")
 
-st.write(f"Does file exist before webrtc? {os.path.exists(DEFAULT_USER_VIDEO_FILENAME)}")
 if not os.path.exists(DEFAULT_USER_VIDEO_FILENAME):
     webrtc_streamer(
         key="loopback",
