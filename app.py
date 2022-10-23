@@ -1,3 +1,8 @@
+"""
+NOTE: If you're going to record a video using your webcam, it's required that you submit feedback for it,
+otherwise the app breaks!
+"""
+
 import os
 import random
 import sys
@@ -163,6 +168,10 @@ if os.path.exists(DEFAULT_USER_VIDEO_FILENAME):
     video_url = S3_CLIENT.generate_presigned_url(ClientMethod='get_object', Params={"Bucket": S3_BUCKET_NAME, "Key": f"{S3_UPLOADED_VIDEOS_FOLDER}/{user_video_name}.mp4"})
     video_s3_url = f"https://{S3_BUCKET_NAME}.s3.amazonaws.com/{S3_UPLOADED_VIDEOS_FOLDER}/{user_video_name}.mp4"
 
+
+######################################
+# Model prediction and user feedback
+######################################
 if video_url is not None:
     ##########################
     # Model prediction logic
@@ -186,6 +195,9 @@ if video_url is not None:
     ##########################
     # User feedback logic
     ##########################
+    if os.path.exists(DEFAULT_USER_VIDEO_FILENAME):
+        st.write("NOTE: Since you recorded a video using your webcam, we need you to go through the next step below (user feedback process), otherwise our app breaks :(")
+
     correctness_state = st.selectbox("Before finishing up, we'd appreciate it if you tell us whether the model prediction was correct or not!",
                 ("Select an option.", CORRECT_PREDICTION_DROPDOWN_TEXT, INCORRECT_PREDICTION_DROPDOWN_TEXT))    
     if correctness_state in {CORRECT_PREDICTION_DROPDOWN_TEXT, INCORRECT_PREDICTION_DROPDOWN_TEXT}:
