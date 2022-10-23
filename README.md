@@ -25,7 +25,7 @@ and it returns the predicted word/text for that sign. Currently this works at th
 
 For more information, take a look at our presentation [slides](https://docs.google.com/presentation/d/1CiP4QLu5_bdibrZnjJygrSOjV-iFaqD7irHi4fD6CJc/edit?usp=sharing).
 
-Built for the 2022 Full Stack Deep Learning (FSDL) class by Shivam Arora, Daniel Firebanks, Pablo Oberhauser, Dhruv Shah, Ibrahim Sherif, and Samuel Tang. 
+Built for the 2022 Full Stack Deep Learning (FSDL) class by Shivam Arora, Daniel Firebanks-Quevedo, Pablo Oberhauser, Dhruv Shah, Ibrahim Sherif, and Samuel Tang. 
 
 ## Pre-requisites
 
