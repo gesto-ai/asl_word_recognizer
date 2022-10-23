@@ -7,6 +7,7 @@ import boto3
 import pandas as pd
 import s3fs
 import streamlit as st
+from pathlib import Path
 
 from predictor_backend import PredictorBackend
 import av
@@ -142,6 +143,12 @@ webrtc_streamer(
     out_recorder_factory=out_recorder_factory,
     on_video_ended=stop_button
 )
+
+print("Does this path exist?")
+print(os.path.exists("user_recording.mp4"))
+print(Path(__file__).resolve())
+print(Path(__file__).resolve().parent)
+print(os.listdir(Path(__file__).resolve().parent))
     
 
 if video_url is not None:
