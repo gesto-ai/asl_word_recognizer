@@ -92,6 +92,7 @@ elif input_video_url:
     if input_video_url in SAMPLE_VIDEO_URLS:
         video_filename = os.path.basename(input_video_url)
         video_url = S3_CLIENT.generate_presigned_url(ClientMethod='get_object', Params={"Bucket": S3_BUCKET_NAME, "Key": f"{S3_UPLOADED_VIDEOS_FOLDER}/{video_filename}"})
+        video_s3_url = f"https://{S3_BUCKET_NAME}.s3.amazonaws.com/{S3_UPLOADED_VIDEOS_FOLDER}/{video_filename}.mp4"
         print(f"Presigned URL for input video URL: {video_url}")
     else:
         # Encode video URL for ease of naming
