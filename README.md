@@ -1,6 +1,8 @@
 # ASL Word Recognizer App
 
-This repository contains the code to run a Streamlit app that takes in a video URL/file containing a person doing a sign, and it returns the predicted word/text for that sign. Currently this works at the word-level only.
+This repository contains the code to run a Streamlit app that takes in a video URL/file containing a person doing a sign, and it returns the predicted word/text for that sign. Currently this works at the word-level only. 
+
+**Demo:** [https://gesto-ai-model-serve-app-video-app-vs3664.streamlitapp.com/](https://gesto-ai-model-serve-app-video-app-vs3664.streamlitapp.com/)
 
 **Model:** [Inception I3D](https://github.com/deepmind/kinetics-i3d)
 
