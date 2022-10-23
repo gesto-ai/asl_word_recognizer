@@ -119,24 +119,23 @@ elif input_video_url:
 # Option 3: Webcam video
 ##############################
 
-# if st.button('Click here if you want to use your webcam!'):
 st.write("Or use your webcam:")
 DEFAULT_USER_VIDEO_FILENAME = "user_recording.mp4"
 
-class VideoProcessor(VideoProcessorBase):
-    def recv(self, frame: av.VideoFrame) -> av.VideoFrame:
-        img = frame.to_ndarray(format="bgr24")
-        flipped = img[:,::-1,:] 
-
-        return av.VideoFrame.from_ndarray(flipped, format="bgr24")
-
-def out_recorder_factory() -> MediaRecorder:
-    return MediaRecorder(DEFAULT_USER_VIDEO_FILENAME, format="mp4")
-
-def stop_button():
-    print("User webcam recording stopped!")
-
 if not os.path.exists(DEFAULT_USER_VIDEO_FILENAME):
+    class VideoProcessor(VideoProcessorBase):
+        def recv(self, frame: av.VideoFrame) -> av.VideoFrame:
+            img = frame.to_ndarray(format="bgr24")
+            flipped = img[:,::-1,:] 
+
+            return av.VideoFrame.from_ndarray(flipped, format="bgr24")
+
+    def out_recorder_factory() -> MediaRecorder:
+        return MediaRecorder(DEFAULT_USER_VIDEO_FILENAME, format="mp4")
+
+    def stop_button():
+        print("User webcam recording stopped!")
+
     webrtc_streamer(
         key="loopback",
         mode=WebRtcMode.SENDRECV,
