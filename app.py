@@ -216,4 +216,5 @@ if video_url is not None:
             st.write(f"Uploaded feedback to our internal files. Check back soon for an updated model!")
 
             # Remove the local video to allow for new webcam videos to be recorded under the same name
-            os.remove(DEFAULT_USER_VIDEO_FILENAME)
+            if os.path.exists(DEFAULT_USER_VIDEO_FILENAME):
+                os.remove(DEFAULT_USER_VIDEO_FILENAME)
