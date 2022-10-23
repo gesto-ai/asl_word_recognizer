@@ -177,16 +177,16 @@ if video_url is not None:
     # Model prediction logic
     ##########################
     st.video(video_url)
-    st.write("Loading model...")
+    st.write("- Loading model...")
     if AWS_LAMBDA_URL is None:
         print("AWS Lambda URL not found. Initializing model with local code...")
         model = PredictorBackend()
     else:
         print("AWS Lambda URL found! Initializing model with predictor backend...")
         model = PredictorBackend(url=AWS_LAMBDA_URL)
-    st.write("Getting prediction...")
+    st.write("- Getting prediction...")
     prediction = model.run(video_url)
-    st.write(f"Prediction: {prediction}")
+    st.write(f"### Prediction: {prediction}")
 
     # Print the expected label for the demo video
     if video_url == DEMO_VIDEO_URL:
@@ -196,7 +196,7 @@ if video_url is not None:
     # User feedback logic
     ##########################
     if os.path.exists(DEFAULT_USER_VIDEO_FILENAME):
-        st.write("NOTE: Since you recorded a video using your webcam, we need you to go through the next step below (user feedback process), otherwise our app breaks :(")
+        st.write("**IMPORTANT NOTE: Since you recorded a video using your webcam, we need you to go through the next step below (user feedback process), otherwise our app breaks :(**")
 
     correctness_state = st.selectbox("Before finishing up, we'd appreciate it if you tell us whether the model prediction was correct or not!",
                 ("Select an option.", CORRECT_PREDICTION_DROPDOWN_TEXT, INCORRECT_PREDICTION_DROPDOWN_TEXT))    
