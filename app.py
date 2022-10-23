@@ -187,7 +187,7 @@ if video_url is not None:
     ##########################
     # User feedback logic
     ##########################
-    correctness_state = st.selectbox('Would you like to submit feedback?',
+    correctness_state = st.selectbox("Before finishing up, we'd appreciate it if you tell us whether the model prediction was correct or not!",
                 ("Select an option.", CORRECT_PREDICTION_DROPDOWN_TEXT, INCORRECT_PREDICTION_DROPDOWN_TEXT))    
     if correctness_state in {CORRECT_PREDICTION_DROPDOWN_TEXT, INCORRECT_PREDICTION_DROPDOWN_TEXT}:
         print("Starting feedback collection process...")
