@@ -135,6 +135,7 @@ def out_recorder_factory() -> MediaRecorder:
 def stop_button():
     print("User webcam recording stopped!")
 
+st.write(f"Does file exist before webrtc? {os.path.exists(DEFAULT_USER_VIDEO_FILENAME)}")
 if not os.path.exists(DEFAULT_USER_VIDEO_FILENAME):
     webrtc_streamer(
         key="loopback",
@@ -152,8 +153,7 @@ if not os.path.exists(DEFAULT_USER_VIDEO_FILENAME):
 if os.path.exists(DEFAULT_USER_VIDEO_FILENAME):
     # Path that we'll upload the video to in S3
     st.write("Waiting until the video has finished processing...")
-    time.sleep(15)
-    st.write(os.stat(DEFAULT_USER_VIDEO_FILENAME))
+    time.sleep(10)
     user_video_name = f"user_recording_{random.randint(0, 69420)}"
     video_s3_path = f"{S3_BUCKET_NAME}/{S3_UPLOADED_VIDEOS_FOLDER}/{user_video_name}.mp4"
     with open(DEFAULT_USER_VIDEO_FILENAME, "rb") as input_videofile:
@@ -164,6 +164,7 @@ if os.path.exists(DEFAULT_USER_VIDEO_FILENAME):
     video_url = S3_CLIENT.generate_presigned_url(ClientMethod='get_object', Params={"Bucket": S3_BUCKET_NAME, "Key": f"{S3_UPLOADED_VIDEOS_FOLDER}/{user_video_name}.mp4"})
 
     os.remove(DEFAULT_USER_VIDEO_FILENAME)
+    st.write(f"Does file exist after os remove? {os.path.exists(DEFAULT_USER_VIDEO_FILENAME)}")
 
 if video_url is not None:
     ##########################
