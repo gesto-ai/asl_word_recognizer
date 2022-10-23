@@ -8,7 +8,7 @@ import boto3
 import pandas as pd
 import s3fs
 import streamlit as st
-from pathlib import Path
+import time 
 
 from predictor_backend import PredictorBackend
 import av
@@ -146,9 +146,11 @@ webrtc_streamer(
     on_video_ended=stop_button
 )
 
-
 if os.path.exists(DEFAULT_USER_VIDEO_FILENAME):
     # Path that we'll upload the video to in S3
+    st.write("Waiting until the video has finished processing...")
+    time.sleep(15)
+    st.write(os.stat(DEFAULT_USER_VIDEO_FILENAME))
     user_video_name = f"user_recording_{random.randint(0, 69420)}"
     video_s3_path = f"{S3_BUCKET_NAME}/{S3_UPLOADED_VIDEOS_FOLDER}/{user_video_name}.mp4"
     with open(DEFAULT_USER_VIDEO_FILENAME, "rb") as input_videofile:
