@@ -163,9 +163,6 @@ if os.path.exists(DEFAULT_USER_VIDEO_FILENAME):
         st.write(f"Uploaded video to AWS S3!")
     video_url = S3_CLIENT.generate_presigned_url(ClientMethod='get_object', Params={"Bucket": S3_BUCKET_NAME, "Key": f"{S3_UPLOADED_VIDEOS_FOLDER}/{user_video_name}.mp4"})
 
-    os.remove(DEFAULT_USER_VIDEO_FILENAME)
-    st.write(f"Does file exist after os remove? {os.path.exists(DEFAULT_USER_VIDEO_FILENAME)}")
-
 if video_url is not None:
     ##########################
     # Model prediction logic
@@ -217,3 +214,7 @@ if video_url is not None:
             new_df.to_csv(new_videos_csv_s3_path, index=False)
             print(f"Added feedback row to CSV and uploaded to S3! Number of rows after adding: {len(new_df)}. New row: \n{new_row}")
             st.write(f"Uploaded feedback to our internal files. Check back soon for an updated model!")
+        
+            os.remove(DEFAULT_USER_VIDEO_FILENAME)
+    
+    st.write("Are we ever here?")
