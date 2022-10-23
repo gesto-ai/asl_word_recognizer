@@ -1,6 +1,11 @@
 # ASL Word Recognizer App
 
-This repository contains the code to run a Streamlit app that takes in a video URL/file containing a person doing a sign, and it returns the predicted word/text for that sign. Currently this works at the word-level only. 
+This repository contains the code to run a Streamlit app that takes in: 
+- A video URL pointing to an .mp4 file of a person doing a sign
+- An .mp4 file containing a person doing a sign
+- A short webcam recording of yourself doing a sign
+
+and it returns the predicted word/text for that sign. Currently this works at the word-level only. 
 
 **Demo App:** [https://gesto-ai-model-serve-app-video-app-vs3664.streamlitapp.com/](https://gesto-ai-model-serve-app-video-app-vs3664.streamlitapp.com/)  
 **Demo Video:** [https://youtu.be/TuRSicQgn68](https://youtu.be/TuRSicQgn68)  
@@ -12,7 +17,7 @@ This repository contains the code to run a Streamlit app that takes in a video U
 **System Diagram:**
 
 - Data is stored in AWS S3.
-- The model service is packaged and served on an AWS Lambda function.
+- The torchscript model is packaged in a predictor service and served on an AWS Lambda function.
 - The UI/frontend is hosted on Streamlit.
 - There's a user feedback collection feature that stores user predictions in a CSV file in AWS S3.
 
