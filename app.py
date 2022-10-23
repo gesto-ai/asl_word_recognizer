@@ -144,11 +144,11 @@ webrtc_streamer(
     on_video_ended=stop_button
 )
 
-print("Does this path exist?")
-print(os.path.exists("user_recording.mp4"))
-print(Path(__file__).resolve())
-print(Path(__file__).resolve().parent)
-print(os.listdir(Path(__file__).resolve().parent))
+st.write("Does this path exist?")
+st.write(os.path.exists("user_recording.mp4"))
+st.write(Path(__file__).resolve())
+st.write(Path(__file__).resolve().parent)
+st.write(os.listdir(Path(__file__).resolve().parent))
     
 
 if video_url is not None:
