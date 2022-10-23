@@ -1,4 +1,10 @@
+"""
+NOTE: If you're going to record a video using your webcam, it's required that you submit feedback for it,
+otherwise the app breaks!
+"""
+
 import os
+import random
 import sys
 from datetime import datetime
 from urllib.request import urlretrieve
@@ -7,8 +13,13 @@ import boto3
 import pandas as pd
 import s3fs
 import streamlit as st
+import time 
 
 from predictor_backend import PredictorBackend
+import av
+from aiortc.contrib.media import MediaRecorder
+from streamlit_webrtc import VideoProcessorBase, WebRtcMode, webrtc_streamer
+
 
 ########################################################
 # Defining all constants, helpers and setup
@@ -45,7 +56,7 @@ INCORRECT_PREDICTION_DROPDOWN_TEXT = "Predicted word is incorrect :("
 ########################################################
 
 st.header("Welcome to Gesto AI")
-st.write("Upload any .mp4 video file of a sign or enter a public video URL and get a predicted word as text!")
+st.write("Upload any .mp4 video file of a sign, enter a public video URL, or record a small video of a sign, and get a predicted word as text!")
 st.write("The demo video for this app is [05727.mp4](https://sign-recognizer.s3.amazonaws.com/new-videos/05727.mp4) (prediction = 'before') from the WLASL dataset.")
 
 input_video_url = st.text_input('Please enter a public URL pointing directly to an .mp4 video:')
@@ -86,6 +97,7 @@ elif input_video_url:
     if input_video_url in SAMPLE_VIDEO_URLS:
         video_filename = os.path.basename(input_video_url)
         video_url = S3_CLIENT.generate_presigned_url(ClientMethod='get_object', Params={"Bucket": S3_BUCKET_NAME, "Key": f"{S3_UPLOADED_VIDEOS_FOLDER}/{video_filename}"})
+        video_s3_url = f"https://{S3_BUCKET_NAME}.s3.amazonaws.com/{S3_UPLOADED_VIDEOS_FOLDER}/{video_filename}.mp4"
         print(f"Presigned URL for input video URL: {video_url}")
     else:
         # Encode video URL for ease of naming
@@ -107,21 +119,74 @@ elif input_video_url:
         video_s3_url = f"https://{S3_BUCKET_NAME}.s3.amazonaws.com/{S3_UPLOADED_VIDEOS_FOLDER}/{encoded_video_name}.mp4"
         print(f"Presigned URL for input video URL: {video_url}")
 
+
+##############################
+# Option 3: Webcam video
+##############################
+
+st.write("Or use your webcam:")
+DEFAULT_USER_VIDEO_FILENAME = "user_recording.mp4"
+
+if not os.path.exists(DEFAULT_USER_VIDEO_FILENAME):
+    class VideoProcessor(VideoProcessorBase):
+        def recv(self, frame: av.VideoFrame) -> av.VideoFrame:
+            img = frame.to_ndarray(format="bgr24")
+            flipped = img[:,::-1,:] 
+
+            return av.VideoFrame.from_ndarray(flipped, format="bgr24")
+
+    def out_recorder_factory() -> MediaRecorder:
+        return MediaRecorder(DEFAULT_USER_VIDEO_FILENAME, format="mp4")
+
+    def stop_button():
+        print("User webcam recording stopped!")
+
+    webrtc_streamer(
+        key="loopback",
+        mode=WebRtcMode.SENDRECV,
+        rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
+        media_stream_constraints={
+            "video": True,
+            "audio": False,
+        },
+        video_processor_factory=VideoProcessor,
+        out_recorder_factory=out_recorder_factory,
+        on_video_ended=stop_button
+    )
+
+if os.path.exists(DEFAULT_USER_VIDEO_FILENAME):
+    # Path that we'll upload the video to in S3
+    st.write("Waiting until the video has finished processing...")
+    time.sleep(10)
+    user_video_name = f"user_recording_{random.randint(0, 69420)}"
+    video_s3_path = f"{S3_BUCKET_NAME}/{S3_UPLOADED_VIDEOS_FOLDER}/{user_video_name}.mp4"
+    with open(DEFAULT_USER_VIDEO_FILENAME, "rb") as input_videofile:
+        # Save video to our S3 bucket
+        with fs.open(video_s3_path, mode='wb') as f:
+            f.write(input_videofile.read()) 
+        st.write(f"Uploaded video to AWS S3!")
+    video_url = S3_CLIENT.generate_presigned_url(ClientMethod='get_object', Params={"Bucket": S3_BUCKET_NAME, "Key": f"{S3_UPLOADED_VIDEOS_FOLDER}/{user_video_name}.mp4"})
+    video_s3_url = f"https://{S3_BUCKET_NAME}.s3.amazonaws.com/{S3_UPLOADED_VIDEOS_FOLDER}/{user_video_name}.mp4"
+
+
+######################################
+# Model prediction and user feedback
+######################################
 if video_url is not None:
     ##########################
     # Model prediction logic
     ##########################
     st.video(video_url)
-    st.write("Loading model...")
+    st.write("- Loading model...")
     if AWS_LAMBDA_URL is None:
         print("AWS Lambda URL not found. Initializing model with local code...")
         model = PredictorBackend()
     else:
         print("AWS Lambda URL found! Initializing model with predictor backend...")
         model = PredictorBackend(url=AWS_LAMBDA_URL)
-    st.write("Getting prediction...")
+    st.write("- Getting prediction...")
     prediction = model.run(video_url)
-    st.write(f"Prediction: {prediction}")
+    st.write(f"### Prediction: {prediction}")
 
     # Print the expected label for the demo video
     if video_url == DEMO_VIDEO_URL:
@@ -130,7 +195,10 @@ if video_url is not None:
     ##########################
     # User feedback logic
     ##########################
-    correctness_state = st.selectbox('Would you like to submit feedback?',
+    if os.path.exists(DEFAULT_USER_VIDEO_FILENAME):
+        st.write("**IMPORTANT NOTE: Since you recorded a video using your webcam, we need you to go through the next step below (user feedback process), otherwise our app breaks :(**")
+
+    correctness_state = st.selectbox("Before finishing up, we'd appreciate it if you tell us whether the model prediction was correct or not!",
                 ("Select an option.", CORRECT_PREDICTION_DROPDOWN_TEXT, INCORRECT_PREDICTION_DROPDOWN_TEXT))    
     if correctness_state in {CORRECT_PREDICTION_DROPDOWN_TEXT, INCORRECT_PREDICTION_DROPDOWN_TEXT}:
         print("Starting feedback collection process...")
@@ -159,5 +227,6 @@ if video_url is not None:
             print(f"Added feedback row to CSV and uploaded to S3! Number of rows after adding: {len(new_df)}. New row: \n{new_row}")
             st.write(f"Uploaded feedback to our internal files. Check back soon for an updated model!")
 
-
-    
+            # Remove the local video to allow for new webcam videos to be recorded under the same name
+            if os.path.exists(DEFAULT_USER_VIDEO_FILENAME):
+                os.remove(DEFAULT_USER_VIDEO_FILENAME)

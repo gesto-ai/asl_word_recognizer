@@ -7,3 +7,4 @@ s3fs==2022.8.2
 streamlit==1.13.0
 torch==1.12.1
 torchvision==0.13.1
+streamlit-webrtc
